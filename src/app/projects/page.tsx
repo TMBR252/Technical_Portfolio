@@ -14,8 +14,6 @@ import { HeroParallax } from '@/components/ui/hero-parallax';
 import { LogoTimeline, LogoItem } from '@/components/ui/logo-timeline';
 import { Icons } from '@/components/icons';
 import { Meteors } from '@/components/ui/meteors';
-import { ProjectStats } from '@/components/sections/ProjectStats';
-
 import { usePerformance } from '@/hooks/usePerformance';
 import { ProjectPlaceholder, getPlaceholderImageUrl } from '@/components/projects/ProjectPlaceholder';
 import { DeferredMount } from '@/components/ui/DeferredMount';
@@ -1135,22 +1133,18 @@ export default function ProjectsPage() {
             <DeferredMount>
                 <HeroParallax products={products} isLowPowerMode={isLowPowerMode} />
 
-                {/* Project Stats - Impressive Metrics */}
-                <ProjectStats isLowPowerMode={isLowPowerMode} />
-
-
-                <div id="project-archive" className="max-w-[1536px] mx-auto relative z-10 pb-12 sm:pb-16 md:pb-20 px-4 sm:px-6 md:px-8">
+                <div id="project-archive" className="relative z-10 mx-auto max-w-[1536px] px-4 pb-12 sm:px-6 sm:pb-16 md:px-8 md:pb-20">
                     {/* Search & Filter Control Bar */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="mb-10 sm:mb-12 md:mb-16"
+                        className="mb-8 sm:mb-10"
                     >
-                        <div className="flex flex-col gap-6 p-0 sm:p-2 rounded-3xl bg-transparent">
+                        <div className="flex flex-col gap-4 rounded-3xl bg-transparent p-0 sm:gap-6 sm:p-2">
 
                             {/* Top Partition: Header & Search */}
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2">
+                            <div className="flex flex-col justify-between gap-3 px-2 md:flex-row md:items-center md:gap-4">
                                 {/* Title & Count */}
                                 <div className="flex items-center gap-3">
                                     <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -1189,7 +1183,7 @@ export default function ProjectsPage() {
                             {/* Divider - REMOVED */}
 
                             {/* Bottom Partition: Controls */}
-                            <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6 xl:gap-4">
+                            <div className="flex flex-col items-start justify-between gap-4 xl:flex-row xl:items-center">
 
                                 {/* Categories - Horizontal Scroll */}
                                 <div className="w-full xl:w-auto overflow-x-auto pb-2 xl:pb-0 no-scrollbar">

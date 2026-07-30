@@ -1,16 +1,17 @@
 "use client";
-import React from "react";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useSpring,
-  MotionValue,
-} from "framer-motion";
 
-import { useTranslations } from 'next-intl';
+import React, { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { useLenis } from "lenis/react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { cn } from "@/lib/utils";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export const HeroParallax = ({
   products,
@@ -25,109 +26,234 @@ export const HeroParallax = ({
 }) => {
   const firstRow = products.slice(0, 5);
   const secondRow = products.slice(5, 10);
-  const ref = React.useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
 
-  // Spring smooths ONLY the rotation to prevent aliasing jitter ("shaking")
-  const rotateSpringConfig = { stiffness: 200, damping: 20 };
+  const trackRef = useRef<HTMLElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const imagesRef = useRef<HTMLDivElement>(null);
+  const rowARef = useRef<HTMLDivElement>(null);
+  const rowBRef = useRef<HTMLDivElement>(null);
 
-  const translateX = useTransform(scrollYProgress, [0, 1], [0, isLowPowerMode ? 200 : 800]);
-  const translateXReverse = useTransform(scrollYProgress, [0, 1], [0, isLowPowerMode ? -200 : -800]);
+  const lenis = useLenis();
 
-  const rotateXRaw = useTransform(scrollYProgress, [0, 0.2], [isLowPowerMode ? 0 : 5, 0]);
-  const rotateX = useSpring(rotateXRaw, rotateSpringConfig);
+  useEffect(() => {
+    const track = trackRef.current;
+    const stage = stageRef.current;
+    const header = headerRef.current;
+    const images = imagesRef.current;
+    const rowA = rowARef.current;
+    const rowB = rowBRef.current;
+    if (!track || !stage || !header || !images || !rowA || !rowB) return;
 
-  const opacity = useTransform(scrollYProgress, [0, 0.2], [isLowPowerMode ? 0.8 : 0.2, 1]);
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
 
-  const rotateZRaw = useTransform(scrollYProgress, [0, 0.2], [isLowPowerMode ? 0 : 5, 0]);
-  const rotateZ = useSpring(rotateZRaw, rotateSpringConfig);
-  const translateY = useTransform(scrollYProgress, [0, 0.2], [isLowPowerMode ? -100 : -500, isLowPowerMode ? 100 : 500]);
+    if (prefersReducedMotion) {
+      gsap.set(images, {
+        opacity: 0.2,
+        filter: "grayscale(0.85)",
+        y: isLowPowerMode ? 80 : 120,
+        pointerEvents: "auto",
+      });
+      gsap.set(header, { clearProps: "all" });
+      gsap.set(stage, { height: "100dvh" });
+      return;
+    }
+
+    const imageRestY = isLowPowerMode ? 40 : 56;
+    const imageExitY = isLowPowerMode ? -200 : -280;
+    const xTravel = isLowPowerMode ? 6 : 12;
+
+    const setImagesClickable = (on: boolean) => {
+      images.style.pointerEvents = on ? "auto" : "none";
+    };
+
+    const ctx = gsap.context(() => {
+      gsap.set(images, {
+        y: imageRestY,
+        opacity: 0.18,
+        filter: "grayscale(0.85)",
+        pointerEvents: "none",
+      });
+      gsap.set(header, { yPercent: 0, opacity: 1 });
+      gsap.set([rowA, rowB], { xPercent: 0 });
+      gsap.set(stage, { height: "100dvh", overflow: "hidden" });
+      setImagesClickable(false);
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: track,
+          start: "top top",
+          // Longer runway = slower scrub (was too fast at ~140%)
+          end: () => (isLowPowerMode ? "+=180%" : "+=220%"),
+          pin: true,
+          scrub: 0.8,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            setImagesClickable(self.progress > 0.02);
+          },
+          // Collapse spent hero so Building The Future isn't parked under a black band
+          onLeave: () => {
+            gsap.set(stage, { height: 0, overflow: "hidden" });
+            gsap.set(track, { height: 0, overflow: "hidden" });
+          },
+          onEnterBack: () => {
+            gsap.set(track, { height: "auto", overflow: "visible" });
+            gsap.set(stage, { height: "100dvh", overflow: "hidden" });
+          },
+        },
+      });
+
+      // Phase A — title drifts out slowly; collage brightens and holds
+      tl.to(
+        header,
+        { yPercent: -110, opacity: 0, ease: "none", duration: 2.2 },
+        0
+      );
+      tl.to(rowA, { xPercent: xTravel, ease: "none", duration: 4 }, 0);
+      tl.to(rowB, { xPercent: -xTravel, ease: "none", duration: 4 }, 0);
+      tl.to(
+        images,
+        {
+          opacity: 0.88,
+          filter: "grayscale(0)",
+          ease: "none",
+          duration: 2.0,
+        },
+        0
+      );
+
+      // Phase B — long soft fade (was ~0.45 — felt like a snap)
+      tl.to(images, { y: imageExitY, ease: "none", duration: 1.6 }, 2.4);
+      tl.to(images, { opacity: 0, ease: "none", duration: 1.6 }, 2.4);
+    }, track);
+
+    const onLenisScroll = () => ScrollTrigger.update();
+    lenis?.on("scroll", onLenisScroll);
+
+    const refreshId = window.requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+    });
+
+    return () => {
+      window.cancelAnimationFrame(refreshId);
+      lenis?.off("scroll", onLenisScroll);
+      ctx.revert();
+    };
+  }, [isLowPowerMode, lenis, products.length]);
+
   return (
-    <div
-      ref={ref}
-      className={cn(
-        "pt-10 pb-20 sm:pb-40 overflow-hidden antialiased relative flex flex-col self-auto",
-        isLowPowerMode
-          ? "h-[100vh] sm:h-[120vh]"
-          : "h-[180vh] sm:h-[200vh] lg:h-[250vh] [perspective:2000px] [transform-style:preserve-3d]"
-      )}
-    >
-      <Header />
-      <motion.div
-        style={{
-          translateY,
-          opacity,
-          backfaceVisibility: 'hidden',
-        }}
-        className=""
-      >
-        <motion.div className={cn("flex flex-row-reverse space-x-reverse space-x-20 mb-20", isLowPowerMode && "mb-10 space-x-10")}>
-          {firstRow.map((product) => (
-            <ProductCard
-              product={product}
-              translate={translateX}
-              key={product.title}
-              isLowPowerMode={isLowPowerMode}
-            />
-          ))}
-        </motion.div>
-        <motion.div className={cn("flex flex-row mb-20 space-x-20", isLowPowerMode && "mb-10 space-x-10")}>
-          {secondRow.map((product) => (
-            <ProductCard
-              product={product}
-              translate={translateXReverse}
-              key={product.title}
-              isLowPowerMode={isLowPowerMode}
-            />
-          ))}
-        </motion.div>
-      </motion.div>
-    </div>
+    <>
+      <section ref={trackRef} className="relative w-full">
+        <div
+          ref={stageRef}
+          className="relative h-[100dvh] w-full overflow-hidden"
+        >
+          <Header headerRef={headerRef} />
+
+          <div
+            ref={imagesRef}
+            data-hero-images
+            className="pointer-events-none absolute inset-x-0 top-0 z-0 flex min-h-full flex-col justify-center pt-6 will-change-transform"
+          >
+            <div
+              ref={rowARef}
+              className={cn(
+                "mb-8 flex flex-row-reverse space-x-16 space-x-reverse will-change-transform md:mb-10 md:space-x-20",
+                isLowPowerMode && "mb-6 space-x-10"
+              )}
+            >
+              {firstRow.map((product) => (
+                <ProductCard
+                  product={product}
+                  key={product.title}
+                  isLowPowerMode={isLowPowerMode}
+                />
+              ))}
+            </div>
+            <div
+              ref={rowBRef}
+              className={cn(
+                "mb-0 flex flex-row space-x-16 will-change-transform md:space-x-20",
+                isLowPowerMode && "space-x-10"
+              )}
+            >
+              {secondRow.map((product) => (
+                <ProductCard
+                  product={product}
+                  key={product.title}
+                  isLowPowerMode={isLowPowerMode}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Own section below the hero — no negative margin, no overlap */}
+      <section className="relative z-10 bg-background px-4 py-10 sm:px-6 sm:py-12 md:px-8 md:py-14">
+        <div className="container-creative text-center">
+          <div className="flex flex-col items-center gap-4">
+            <h2 className="text-3xl font-black tracking-tight text-foreground sm:text-4xl md:text-5xl">
+              Building The Future
+            </h2>
+            <p className="max-w-2xl text-base leading-6 text-muted-foreground sm:text-lg sm:leading-7">
+              Transforming ideas into production-ready solutions that drive
+              real-world impact
+            </p>
+          </div>
+        </div>
+      </section>
+    </>
   );
 };
 
-import { Mouse } from "lucide-react";
-
-export const Header = () => {
-  const t = useTranslations('projectHeader');
+export const Header = ({
+  headerRef,
+}: {
+  headerRef: React.RefObject<HTMLDivElement | null>;
+}) => {
+  const t = useTranslations("projectHeader");
   return (
-    <div className="max-w-7xl relative mx-auto pt-32 md:pt-48 px-4 w-full left-0 top-0 text-center flex flex-col items-center">
-      <h1 className="text-2xl md:text-7xl font-bold dark:text-white">
-        {t('title')}
-      </h1>
-      <p
-        className="max-w-2xl text-base md:text-xl mt-8 dark:text-neutral-200 text-center"
-        dangerouslySetInnerHTML={{ __html: t.raw('subtitle') }}
-      />
+    <div
+      ref={headerRef}
+      data-hero-header
+      className="pointer-events-none absolute inset-x-0 top-0 z-20 flex h-full w-full flex-col items-center justify-center px-4 pt-[18vh] text-center will-change-transform md:pt-[20vh]"
+    >
+      <div className="pointer-events-auto mx-auto flex w-full max-w-7xl flex-col items-center">
+        <h1 className="text-2xl font-bold dark:text-white md:text-7xl">
+          {t("title")}
+        </h1>
+        <p
+          className="mx-auto mt-8 max-w-2xl text-center text-base dark:text-neutral-200 md:text-xl"
+          dangerouslySetInnerHTML={{ __html: t.raw("subtitle") }}
+        />
 
-      {/* Scroll Indicator */}
-      <motion.div
-        className="absolute left-1/2 -translate-x-1/2 -bottom-32 md:-bottom-48 flex flex-col items-center gap-2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2, duration: 1 }}
-      >
-        <div className="w-[1px] h-10 md:h-16 bg-gradient-to-b from-transparent via-neutral-400 to-transparent relative overflow-hidden">
-          <motion.div
-            className="absolute top-0 w-full h-1/2 bg-white blur-[1px]"
-            animate={{ y: [0, 40, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </div>
-        <span className="text-[9px] uppercase tracking-[0.3em] text-neutral-500 font-medium">
-          Scroll
-        </span>
-      </motion.div>
+        <motion.div
+          className="mt-10 flex flex-col items-center gap-2 md:mt-14"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2, duration: 1 }}
+        >
+          <div className="relative h-10 w-px overflow-hidden bg-gradient-to-b from-transparent via-neutral-400 to-transparent md:h-16">
+            <motion.div
+              className="absolute top-0 h-1/2 w-full bg-white blur-[1px]"
+              animate={{ y: [0, 40, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </div>
+          <span className="text-[9px] font-medium uppercase tracking-[0.3em] text-neutral-500">
+            Scroll
+          </span>
+        </motion.div>
+      </div>
     </div>
   );
 };
 
 export const ProductCard = ({
   product,
-  translate,
   isLowPowerMode,
 }: {
   product: {
@@ -135,39 +261,32 @@ export const ProductCard = ({
     link: string;
     thumbnail: string;
   };
-  translate: MotionValue<number>;
   isLowPowerMode?: boolean;
 }) => {
   return (
     <motion.div
-      style={{
-        x: translate,
-      }}
-      whileHover={isLowPowerMode ? {} : {
-        y: -20,
-      }}
+      whileHover={isLowPowerMode ? {} : { y: -20 }}
       key={product.title}
       className={cn(
         "group/product relative shrink-0",
-        isLowPowerMode ? "h-48 w-[12rem] md:h-64 md:w-[20rem]" : "h-64 w-[16rem] md:h-96 md:w-[30rem]"
+        isLowPowerMode
+          ? "h-48 w-[12rem] md:h-64 md:w-[20rem]"
+          : "h-64 w-[16rem] md:h-96 md:w-[30rem]"
       )}
     >
-      <a
-        href={product.link}
-        className="block group-hover/product:shadow-2xl "
-      >
+      <a href={product.link} className="block group-hover/product:shadow-2xl">
         <Image
           src={product.thumbnail}
           height={600}
           width={600}
-          className="object-cover object-left-top absolute h-full w-full inset-0"
+          className="absolute inset-0 h-full w-full object-cover object-left-top"
           alt={product.title}
           priority={true}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       </a>
-      <div className="absolute inset-0 h-full w-full opacity-0 group-hover/product:opacity-80 bg-black pointer-events-none"></div>
-      <h2 className="absolute bottom-4 left-4 opacity-0 group-hover/product:opacity-100 text-white">
+      <div className="pointer-events-none absolute inset-0 h-full w-full bg-black opacity-0 group-hover/product:opacity-80" />
+      <h2 className="absolute bottom-4 left-4 text-white opacity-0 group-hover/product:opacity-100">
         {product.title}
       </h2>
     </motion.div>

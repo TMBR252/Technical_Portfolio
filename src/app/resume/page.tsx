@@ -1,26 +1,12 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Download, ExternalLink, Loader2 } from 'lucide-react';
+import { ArrowLeft, Download, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { usePerformance } from '@/hooks/usePerformance';
+import { ResumeEmbed } from '@/components/ui/resume-embed';
 
 const RESUME_URL = '/resume.pdf';
-
-/** pdf.js needs browser DOM APIs — never SSR */
-const PdfViewer = dynamic(
-    () => import('@/components/ui/pdf-viewer').then((m) => m.PdfViewer),
-    {
-        ssr: false,
-        loading: () => (
-            <div className="flex h-full w-full flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-background">
-                <Loader2 className="size-8 animate-spin text-primary" />
-                <p className="text-sm font-medium text-muted-foreground">Loading document…</p>
-            </div>
-        ),
-    }
-);
 
 export default function ResumePage() {
     const { isLowPowerMode, isMobile } = usePerformance();
@@ -45,7 +31,7 @@ export default function ResumePage() {
                         href={RESUME_URL}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 rounded-full bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-all active:scale-95 shadow-sm text-sm sm:text-base"
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 rounded-full bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-all active:scale-95 shadow-sm text-sm sm:text-base touch-manipulation"
                     >
                         <ExternalLink className="w-4 h-4 shrink-0" />
                         <span>{isMobile ? 'Open' : 'Open in New Tab'}</span>
@@ -53,7 +39,7 @@ export default function ResumePage() {
                     <a
                         href={RESUME_URL}
                         download="Tyler_Bryan_Design_Engineer.pdf"
-                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 rounded-full bg-primary text-primary-foreground font-medium hover:opacity-90 transition-all active:scale-95 shadow-sm text-sm sm:text-base"
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 rounded-full bg-primary text-primary-foreground font-medium hover:opacity-90 transition-all active:scale-95 shadow-sm text-sm sm:text-base touch-manipulation"
                     >
                         <Download className="w-4 h-4 shrink-0" />
                         <span>Download</span>
@@ -67,9 +53,7 @@ export default function ResumePage() {
                 transition={{ delay: 0.15 }}
                 className="flex-1 w-full max-w-[1400px] mx-auto px-3 sm:px-4 md:px-6 min-h-0 pb-4 relative"
             >
-                <div className="w-full h-full min-h-0 overflow-hidden">
-                    <PdfViewer url={RESUME_URL} />
-                </div>
+                <ResumeEmbed />
             </motion.div>
         </div>
     );
