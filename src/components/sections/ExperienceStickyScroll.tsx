@@ -32,7 +32,7 @@ export default function ExperienceStickyScroll({ isLowPowerMode = false }: { isL
                         </div>
                         <h3 className="text-3xl font-black text-neutral-900 dark:text-white mb-4">Design & Product</h3>
                         <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                            NYC-based Design & Product Engineer focused on AI-native experiences — interface craft, design systems, and full-stack product surfaces that ship.
+                            NYC-based Product Engineer taking complex, expert-driven automation products from 0 to 1 — agentic architectures, human-in-the-loop systems, and evaluation frameworks.
                         </p>
                     </div>
 

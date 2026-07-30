@@ -142,36 +142,36 @@
             },
             "experiencesList": [
                 {
-                    "company": "FlyRank AI",
-                    "role": "MACHINE LEARNING ENGINEER",
-                    "desc": "Applied AI development in a remote-first, product-driven engineering environment — models, evaluation, and shipping ML features with a distributed team."
+                    "company": "Primitive AI",
+                    "role": "FOUNDER & PRODUCT LEAD, CEO",
+                    "desc": "Designed, built, and shipped an end-to-end spatial AI automation platform from 0 to 1 — 35+ specialized agentic tools and an ingestion pipeline processing 15+ live municipal data streams."
                 },
                 {
-                    "company": "Independent",
-                    "role": "DESIGN & PRODUCT ENGINEER",
-                    "desc": "Open to opportunities in New York — building AI-native product experiences, design systems, and full-stack interfaces for startups and product teams."
+                    "company": "H.A. Sack Company",
+                    "role": "PRODUCT ENGINEER, BIM & AUTOMATION",
+                    "desc": "Owned the solo 0 to 1 lifecycle for an automation engine that routes conduit networks across commercial buildings, replacing manual layout work in six months."
                 }
             ],
             "projectsList": [
                 {
-                    "title": "Creative Portfolio Website",
-                    "desc": "Modern, animated portfolio with 3D elements, physics-simulated interactions, and shader-based warp effects. Engineered for high performance & optimization."
+                    "title": "Primitive AI",
+                    "desc": "End-to-end spatial AI automation platform for real estate feasibility, taken from 0 to 1."
                 },
                 {
-                    "title": "Browser Automation Agent",
-                    "desc": "CLI tool for AI-driven browser automation — natural language control, multi-LLM support, and vision-assisted workflows for scraping and testing."
+                    "title": "Conduit Routing Automation Engine",
+                    "desc": "Automation engine that routes conduit networks across commercial buildings, replacing manual layout work end to end."
                 },
                 {
-                    "title": "Swarm AI Blog Writer",
-                    "desc": "Multi-agent blog generation engine with Planner, Researcher, Writer, and Editor agents — Vue frontend, Flask backend, and professional PDF export."
+                    "title": "Agent Red-Team Evaluation Suite",
+                    "desc": "10-scenario automated adversarial red-team suite, cleared before the agent was trusted with real customer data."
                 },
                 {
-                    "title": "DocsInsight Engine",
-                    "desc": "Private RAG platform for intelligent document analysis. Powered by local LLMs through Ollama, with LangChain orchestration and ChromaDB vector search."
+                    "title": "Property Intelligence & Lead Generation",
+                    "desc": "Automated property intelligence and lead-generation system for a residential contractor, run at scale."
                 },
                 {
-                    "title": "Web3 Guestbook DApp",
-                    "desc": "On-chain guestbook with wallet integration, Solidity contracts, and a polished Next.js frontend for real-time blockchain interaction."
+                    "title": "UBE Platform",
+                    "desc": "Blockchain-based remittance platform with custom point-of-sale hardware for underserved small businesses."
                 }
             ],
             "discoverMore": "Discover More"
@@ -341,7 +341,7 @@
         "faqData": [
             {
                 "q": "What is your main area of expertise?",
-                "a": "I'm a Design & Product Engineer based in New York, focused on AI-native product experiences — interface craft, design systems, full-stack Next.js builds, and agentic workflows where intelligence feels inevitable."
+                "a": "I'm a Product Engineer based in New York, specializing in taking complex, expert-driven automation products from 0 to 1 — agentic architectures, human-in-the-loop systems, and the evaluation frameworks that make them trustworthy."
             },
             {
                 "q": "Are you available for freelance or product collaborations?",
@@ -421,7 +421,7 @@
     },
     "projectHeader": {
         "title": "WORK I'M <span class=\"text-[#D1FF4D]\">PROUD</span> OF",
-        "subtitle": ""
+        "subtitle": "Expert-driven automation products taken from 0 to 1 — agentic systems, human-in-the-loop boundaries, and the evaluation work that makes them trustworthy."
     },
     "common": {
         "loading": "Loading...",

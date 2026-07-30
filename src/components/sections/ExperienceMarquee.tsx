@@ -141,35 +141,27 @@ function ParallaxText({ children, baseVelocity = 100, isLowPowerMode = false }: 
     );
 }
 
-const GalleryItem = ({ logoSrc }: { logoSrc: string }) => {
-    // FlyRank is a white text logo, so it's invisible on light backgrounds. We invert it in Light Mode.
-    const needsInvertInLightMode = logoSrc.includes("flyrank") || logoSrc.includes("FlyRank");
-    const specificClasses = needsInvertInLightMode ? "invert dark:invert-0" : "";
-
+/**
+ * Wordmarks, not logos. The previous version marqueed FlyRank and Microsoft
+ * logos from the original template — neither is an actual employer, which on
+ * a hiring site reads as a claim. Company names come from portfolioData.
+ */
+const GalleryItem = ({ name }: { name: string }) => {
     return (
-        <div className="relative shrink-0 w-[clamp(140px,30vw,200px)] h-[clamp(80px,15vw,120px)] md:w-[280px] md:h-[160px] flex items-center justify-center group cursor-pointer transition-all duration-300 hover:scale-105">
-            <Image
-                src={logoSrc}
-                alt="Partner Logo"
-                fill
-                sizes="(max-width: 768px) 160px, 280px"
-                priority
-                unoptimized
-                className={`object-contain grayscale hover:grayscale-0 opacity-70 group-hover:opacity-100 transition-all duration-300 scale-90 md:scale-100 ${specificClasses}`}
-            />
+        <div className="relative shrink-0 flex items-center justify-center px-[clamp(1rem,4vw,3rem)] h-[clamp(80px,15vw,120px)] md:h-[160px] group transition-all duration-300">
+            <span className="whitespace-nowrap text-[clamp(1.1rem,4vw,1.75rem)] md:text-4xl font-black uppercase tracking-tight text-foreground/40 group-hover:text-foreground transition-colors duration-300">
+                {name}
+            </span>
         </div>
     );
 };
 
 export default function ExperienceMarquee() {
     const { isLowPowerMode } = usePerformance();
-    const allLogos = [
-        "/assets/flyrankailogo.webp",
-        "/assets/microsotlogo.webp",
-    ];
+    const allNames = portfolioData.experiences.map((e) => e.company);
 
-    const row1 = allLogos;
-    const row2 = [...allLogos].reverse();
+    const row1 = allNames;
+    const row2 = [...allNames].reverse();
 
     const ensureLength = (items: string[]) => {
         let repeated = [...items];
@@ -188,15 +180,15 @@ export default function ExperienceMarquee() {
             <div className="flex flex-col gap-2">
                 {/* Row 1: LEFT → RIGHT */}
                 <ParallaxText baseVelocity={40} isLowPowerMode={isLowPowerMode}>
-                    {ensureLength(row1).map((logo, idx) => (
-                        <GalleryItem key={`r1-${idx}`} logoSrc={logo} />
+                    {ensureLength(row1).map((name, idx) => (
+                        <GalleryItem key={`r1-${idx}`} name={name} />
                     ))}
                 </ParallaxText>
 
                 {/* Row 2: RIGHT → LEFT */}
                 <ParallaxText baseVelocity={-40} isLowPowerMode={isLowPowerMode}>
-                    {ensureLength(row2).map((logo, idx) => (
-                        <GalleryItem key={`r2-${idx}`} logoSrc={logo} />
+                    {ensureLength(row2).map((name, idx) => (
+                        <GalleryItem key={`r2-${idx}`} name={name} />
                     ))}
                 </ParallaxText>
             </div>

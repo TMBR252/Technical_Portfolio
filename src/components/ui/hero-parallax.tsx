@@ -1,207 +1,189 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
-import { useLenis } from "lenis/react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { cn } from "@/lib/utils";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+export type HeroProduct = {
+  title: string;
+  href: string;
+  thumbnail: string;
+};
 
+const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
+
+const smoothstep = (edge0: number, edge1: number, x: number) => {
+  const t = clamp01((x - edge0) / (edge1 - edge0));
+  return t * t * (3 - 2 * t);
+};
+
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+const SCROLL_CUBE_INDICES = [0, 1, 2, 3, 4, 5];
+
+/**
+ * Un-pinned hero. The stage is one frame tall and simply scrolls away; the
+ * title drift / collage reveal are driven by the stage's own position in the
+ * viewport, so it behaves identically whether the scroller is the window or
+ * the Marvin page shell.
+ */
 export const HeroParallax = ({
   products,
   isLowPowerMode,
 }: {
-  products: {
-    title: string;
-    link: string;
-    thumbnail: string;
-  }[];
+  products: HeroProduct[];
   isLowPowerMode?: boolean;
 }) => {
   const firstRow = products.slice(0, 5);
   const secondRow = products.slice(5, 10);
 
-  const trackRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const imagesRef = useRef<HTMLDivElement>(null);
   const rowARef = useRef<HTMLDivElement>(null);
   const rowBRef = useRef<HTMLDivElement>(null);
 
-  const lenis = useLenis();
-
   useEffect(() => {
-    const track = trackRef.current;
     const stage = stageRef.current;
     const header = headerRef.current;
     const images = imagesRef.current;
     const rowA = rowARef.current;
     const rowB = rowBRef.current;
-    if (!track || !stage || !header || !images || !rowA || !rowB) return;
+    if (!stage || !header || !images || !rowA || !rowB) return;
 
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-
-    if (prefersReducedMotion) {
-      gsap.set(images, {
-        opacity: 0.2,
-        filter: "grayscale(0.85)",
-        y: isLowPowerMode ? 80 : 120,
-        pointerEvents: "auto",
-      });
-      gsap.set(header, { clearProps: "all" });
-      gsap.set(stage, { height: "100dvh" });
+    // Reduced motion: land on the lit resting state, never listen to scroll.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      images.style.opacity = "0.9";
+      images.style.filter = "grayscale(0)";
+      images.style.pointerEvents = "auto";
       return;
     }
 
-    const imageRestY = isLowPowerMode ? 40 : 56;
-    const imageExitY = isLowPowerMode ? -200 : -280;
-    const xTravel = isLowPowerMode ? 6 : 12;
+    const lift = isLowPowerMode ? 24 : 48; // px the collage outruns the page by
+    const xTravel = isLowPowerMode ? 4 : 8; // % the rows counter-slide
 
-    const setImagesClickable = (on: boolean) => {
-      images.style.pointerEvents = on ? "auto" : "none";
+    const apply = (p: number) => {
+      const lit = smoothstep(0, 0.4, p); // collage wakes up
+      const gone = smoothstep(0, 0.45, p); // title clears out
+
+      header.style.transform = `translate3d(0, ${-32 * gone}%, 0)`;
+      header.style.opacity = String(1 - gone);
+
+      images.style.opacity = String(lerp(0.22, 0.9, lit));
+      images.style.filter = `grayscale(${lerp(0.85, 0, lit)})`;
+      images.style.transform = `translate3d(0, ${-lift * p}px, 0)`;
+      // Keep the collage inert until the title is out of the way.
+      images.style.pointerEvents = p > 0.05 ? "auto" : "none";
+
+      rowA.style.transform = `translate3d(${xTravel * p}%, 0, 0)`;
+      rowB.style.transform = `translate3d(${-xTravel * p}%, 0, 0)`;
     };
 
-    const ctx = gsap.context(() => {
-      gsap.set(images, {
-        y: imageRestY,
-        opacity: 0.18,
-        filter: "grayscale(0.85)",
-        pointerEvents: "none",
-      });
-      gsap.set(header, { yPercent: 0, opacity: 1 });
-      gsap.set([rowA, rowB], { xPercent: 0 });
-      gsap.set(stage, { height: "100dvh", overflow: "hidden" });
-      setImagesClickable(false);
+    let frame = 0;
+    let lastP = -1;
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: track,
-          start: "top top",
-          // Longer runway = slower scrub (was too fast at ~140%)
-          end: () => (isLowPowerMode ? "+=180%" : "+=220%"),
-          pin: true,
-          scrub: 0.8,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            setImagesClickable(self.progress > 0.02);
-          },
-          // Collapse spent hero so the title block isn't parked under a black band
-          onLeave: () => {
-            gsap.set(stage, { height: 0, overflow: "hidden" });
-            gsap.set(track, { height: 0, overflow: "hidden" });
-          },
-          onEnterBack: () => {
-            gsap.set(track, { height: "auto", overflow: "visible" });
-            gsap.set(stage, { height: "100dvh", overflow: "hidden" });
-          },
-        },
-      });
+    const read = () => {
+      frame = 0;
+      const rect = stage.getBoundingClientRect();
 
-      // Phase A — title drifts out slowly; collage brightens and holds
-      tl.to(
-        header,
-        { yPercent: -110, opacity: 0, ease: "none", duration: 2.2 },
-        0
-      );
-      tl.to(rowA, { xPercent: xTravel, ease: "none", duration: 4 }, 0);
-      tl.to(rowB, { xPercent: -xTravel, ease: "none", duration: 4 }, 0);
-      tl.to(
-        images,
-        {
-          opacity: 0.88,
-          filter: "grayscale(0)",
-          ease: "none",
-          duration: 2.0,
-        },
-        0
-      );
+      // When Marvin is open the shell is the scroller and its top edge sits at
+      // --marvin-inset, not 0. Measure against whichever box is scrolling.
+      const shell =
+        document.documentElement.dataset.marvinOpen === "true"
+          ? document.getElementById("marvin-page-shell")
+          : null;
+      const viewTop = shell ? shell.getBoundingClientRect().top : 0;
+      const span =
+        rect.height || (shell ? shell.clientHeight : window.innerHeight);
 
-      // Phase B — long soft fade (was ~0.45 — felt like a snap)
-      tl.to(images, { y: imageExitY, ease: "none", duration: 1.6 }, 2.4);
-      tl.to(images, { opacity: 0, ease: "none", duration: 1.6 }, 2.4);
-    }, track);
+      const p = clamp01((viewTop - rect.top) / span);
+      if (Math.abs(p - lastP) < 0.001) return;
+      lastP = p;
+      apply(p);
+    };
 
-    const onLenisScroll = () => ScrollTrigger.update();
-    lenis?.on("scroll", onLenisScroll);
+    const schedule = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(read);
+    };
 
-    const refreshId = window.requestAnimationFrame(() => {
-      ScrollTrigger.refresh();
+    read();
+
+    // scroll doesn't bubble — capture also catches the shell's scroller.
+    window.addEventListener("scroll", schedule, {
+      capture: true,
+      passive: true,
+    });
+    window.addEventListener("resize", schedule);
+
+    // The frame animates open/closed over 350ms; RO tracks it the whole way.
+    const resizeObserver = new ResizeObserver(schedule);
+    resizeObserver.observe(stage);
+
+    // Toggling Marvin swaps which element scrolls — re-measure immediately.
+    const modeObserver = new MutationObserver(schedule);
+    modeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-marvin-open"],
     });
 
     return () => {
-      window.cancelAnimationFrame(refreshId);
-      lenis?.off("scroll", onLenisScroll);
-      ctx.revert();
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule, { capture: true });
+      window.removeEventListener("resize", schedule);
+      resizeObserver.disconnect();
+      modeObserver.disconnect();
     };
-  }, [isLowPowerMode, lenis, products.length]);
+  }, [isLowPowerMode]);
 
   return (
-    <>
-      <section ref={trackRef} className="relative w-full">
+    <section
+      ref={stageRef}
+      className="relative h-[var(--frame-h,100dvh)] w-full overflow-hidden"
+    >
+      <Header headerRef={headerRef} />
+
+      <div
+        ref={imagesRef}
+        data-hero-images
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 flex min-h-full flex-col justify-center pt-28 will-change-transform"
+        style={{ opacity: 0.22, filter: "grayscale(0.85)" }}
+      >
         <div
-          ref={stageRef}
-          className="relative h-[100dvh] w-full overflow-hidden"
+          ref={rowARef}
+          className={cn(
+            "mb-8 flex flex-row-reverse space-x-16 space-x-reverse will-change-transform md:mb-10 md:space-x-20",
+            isLowPowerMode && "mb-6 space-x-10"
+          )}
         >
-          <Header headerRef={headerRef} />
-
-          <div
-            ref={imagesRef}
-            data-hero-images
-            className="pointer-events-none absolute inset-x-0 top-0 z-0 flex min-h-full flex-col justify-center pt-6 will-change-transform"
-          >
-            <div
-              ref={rowARef}
-              className={cn(
-                "mb-8 flex flex-row-reverse space-x-16 space-x-reverse will-change-transform md:mb-10 md:space-x-20",
-                isLowPowerMode && "mb-6 space-x-10"
-              )}
-            >
-              {firstRow.map((product) => (
-                <ProductCard
-                  product={product}
-                  key={product.title}
-                  isLowPowerMode={isLowPowerMode}
-                />
-              ))}
-            </div>
-            <div
-              ref={rowBRef}
-              className={cn(
-                "mb-0 flex flex-row space-x-16 will-change-transform md:space-x-20",
-                isLowPowerMode && "space-x-10"
-              )}
-            >
-              {secondRow.map((product) => (
-                <ProductCard
-                  product={product}
-                  key={product.title}
-                  isLowPowerMode={isLowPowerMode}
-                />
-              ))}
-            </div>
-          </div>
+          {firstRow.map((product, i) => (
+            <ProductCard
+              product={product}
+              key={`a-${i}-${product.title}`}
+              isLowPowerMode={isLowPowerMode}
+            />
+          ))}
         </div>
-      </section>
-
-      {/* Own section below the hero — no negative margin, no overlap */}
-      <section className="relative z-10 bg-background px-4 py-10 sm:px-6 sm:py-12 md:px-8 md:py-14">
-        <div className="container-creative text-center">
-          <div className="flex flex-col items-center gap-4">
-            <h2 className="text-3xl font-black uppercase tracking-tight text-foreground sm:text-4xl md:text-5xl">
-              Work I&apos;m <span className="text-[#D1FF4D]">Proud</span> Of
-            </h2>
-          </div>
+        <div
+          ref={rowBRef}
+          className={cn(
+            "mb-0 flex flex-row space-x-16 will-change-transform md:space-x-20",
+            isLowPowerMode && "space-x-10"
+          )}
+        >
+          {secondRow.map((product, i) => (
+            <ProductCard
+              product={product}
+              key={`b-${i}-${product.title}`}
+              isLowPowerMode={isLowPowerMode}
+            />
+          ))}
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 };
 
@@ -217,10 +199,15 @@ export const Header = ({
       data-hero-header
       className="pointer-events-none absolute inset-x-0 top-0 z-20 flex h-full w-full flex-col items-center justify-center px-4 pt-[18vh] text-center will-change-transform md:pt-[20vh]"
     >
-      <div className="pointer-events-auto mx-auto flex w-full max-w-7xl flex-col items-center">
+      <div className="mx-auto flex w-full max-w-7xl flex-col items-center">
         <h1
           className="text-2xl font-bold uppercase tracking-tight dark:text-white md:text-6xl lg:text-7xl"
           dangerouslySetInnerHTML={{ __html: t.raw("title") }}
+        />
+
+        <p
+          className="mx-auto mt-4 max-w-xl text-sm text-neutral-400 dark:text-neutral-300 md:mt-6 md:max-w-2xl md:text-lg"
+          dangerouslySetInnerHTML={{ __html: t.raw("subtitle") }}
         />
 
         <motion.div
@@ -229,12 +216,20 @@ export const Header = ({
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2, duration: 1 }}
         >
-          <div className="relative h-10 w-px overflow-hidden bg-gradient-to-b from-transparent via-neutral-400 to-transparent md:h-16">
-            <motion.div
-              className="absolute top-0 h-1/2 w-full bg-white blur-[1px]"
-              animate={{ y: [0, 40, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            />
+          <div className="flex flex-col items-center gap-[3px] md:gap-1">
+            {SCROLL_CUBE_INDICES.map((i) => (
+              <motion.span
+                key={i}
+                className="h-[3px] w-[3px] shrink-0 rounded-[1px] bg-white md:h-1 md:w-1"
+                animate={{ opacity: [0.15, 1, 0.15] }}
+                transition={{
+                  duration: 1.8,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: i * 0.15,
+                }}
+              />
+            ))}
           </div>
           <span className="text-[9px] font-medium uppercase tracking-[0.3em] text-neutral-500">
             Scroll
@@ -249,17 +244,12 @@ export const ProductCard = ({
   product,
   isLowPowerMode,
 }: {
-  product: {
-    title: string;
-    link: string;
-    thumbnail: string;
-  };
+  product: HeroProduct;
   isLowPowerMode?: boolean;
 }) => {
   return (
     <motion.div
       whileHover={isLowPowerMode ? {} : { y: -20 }}
-      key={product.title}
       className={cn(
         "group/product relative shrink-0",
         isLowPowerMode
@@ -267,19 +257,19 @@ export const ProductCard = ({
           : "h-64 w-[16rem] md:h-96 md:w-[30rem]"
       )}
     >
-      <a href={product.link} className="block group-hover/product:shadow-2xl">
+      <Link href={product.href} className="block group-hover/product:shadow-2xl">
         <Image
           src={product.thumbnail}
           height={600}
           width={600}
           className="absolute inset-0 h-full w-full object-cover object-left-top"
           alt={product.title}
-          priority={true}
+          priority
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
-      </a>
+      </Link>
       <div className="pointer-events-none absolute inset-0 h-full w-full bg-black opacity-0 group-hover/product:opacity-80" />
-      <h2 className="absolute bottom-4 left-4 text-white opacity-0 group-hover/product:opacity-100">
+      <h2 className="pointer-events-none absolute bottom-4 left-4 text-white opacity-0 group-hover/product:opacity-100">
         {product.title}
       </h2>
     </motion.div>

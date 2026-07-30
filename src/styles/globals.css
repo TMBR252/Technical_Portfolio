@@ -92,6 +92,12 @@
     min-height: 100%;
     background: hsl(var(--background));
     /*
+     * Height of the layout "window". Full-frame sections use h-[var(--frame-h)]
+     * instead of 100dvh so they fit the shell, not the device, when Marvin
+     * splits the screen.
+     */
+    --frame-h: 100dvh;
+    /*
      * Always the layout "window" for Tailwind sm/md/lg/xl/2xl
      * (see tailwind.config.ts → @container marvin-shell).
      */
@@ -138,6 +144,8 @@
     transform: translate3d(0, 0, 0);
     /* Definite fixed box — enable cqh for fluid height inside the frame */
     container-type: size;
+    /* Now that the shell is a size container, cqh resolves against the frame */
+    --frame-h: 100cqh;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
     transition:
       top 0.35s cubic-bezier(0.16, 1, 0.3, 1),

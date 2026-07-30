@@ -32,11 +32,11 @@ const signature = Alex_Brush({
 
 export const metadata: Metadata = {
     title: {
-        default: 'Tyler Bryan | AI & Software Engineer',
+        default: 'Tyler Bryan | Product Engineer',
         template: '%s | Portfolio',
     },
-    description: 'A passionate developer building digital experiences that inspire. Explore my projects, skills, and professional journey.',
-    keywords: ['developer', 'portfolio', 'web development', 'full stack', 'react', 'nextjs'],
+    description: 'Product Engineer taking complex, expert-driven automation products from 0 to 1. Agentic architectures, human-in-the-loop systems, and evaluation frameworks.',
+    keywords: ['product engineer', 'portfolio', 'AI products', 'agentic systems', 'automation', 'human-in-the-loop', 'nextjs'],
     authors: [{ name: 'Tyler Bryan' }],
     creator: 'Tyler Bryan',
     metadataBase: new URL('https://your-domain.com'),
@@ -44,14 +44,14 @@ export const metadata: Metadata = {
         type: 'website',
         locale: 'en_US',
         url: 'https://your-domain.com',
-        title: 'Tyler Bryan | AI & Software Engineer',
-        description: 'A passionate developer building digital experiences that inspire.',
+        title: 'Tyler Bryan | Product Engineer',
+        description: 'Product Engineer taking complex, expert-driven automation products from 0 to 1.',
         siteName: 'Portfolio',
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'Tyler Bryan | AI & Software Engineer',
-        description: 'A passionate developer building digital experiences that inspire.',
+        title: 'Tyler Bryan | Product Engineer',
+        description: 'Product Engineer taking complex, expert-driven automation products from 0 to 1.',
         creator: '@yourusername',
     },
     robots: {

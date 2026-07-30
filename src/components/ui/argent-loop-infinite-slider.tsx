@@ -4,6 +4,7 @@ import { ArrowRight, ChevronDown, Github, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import MagneticEffect from "@/components/ui/MagneticEffect";
+import { portfolioData } from "@/data/portfolio";
 
 interface ProjectData {
   title: string;
@@ -14,48 +15,27 @@ interface ProjectData {
   slug: string;
 }
 
-const PROJECT_DATA: ProjectData[] = [
-  {
-    title: "Browser Automation Agent",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop&fm=webp",
-    category: "AI & Automation",
-    year: "2026",
-    description: "AI-driven browser interaction & testing engine.",
-    slug: "browser-automation-agent"
-  },
-  {
-    title: "Swarm AI Blog Writer",
-    image: "/project/swarmaiblogwriter1.webp",
-    category: "AI & Content",
-    year: "2025",
-    description: "Multi-agent orchestration for research-backed content.",
-    slug: "swarm-agent-orchestrator"
-  },
-  {
-    title: "Creative Portfolio Website",
-    image: "/project/creativeportfoliowebsite1.webp",
-    category: "Creative Tech",
-    year: "2025",
-    description: "Immersive 3D portfolio with WebGL shaders.",
-    slug: "creative-portfolio-website"
-  },
-  {
-    title: "DocsInsight Engine",
-    image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop&fm=webp",
-    category: "AI & RAG",
-    year: "2025",
-    description: "Private RAG platform for intelligent document analysis.",
-    slug: "docsinsight-engine"
-  },
-  {
-    title: "Web3 Guestbook DApp",
-    image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2070&auto=format&fit=crop&fm=webp",
-    category: "Web3",
-    year: "2025",
-    description: "On-chain guestbook with wallet-native UX.",
-    slug: "web3-guestbook-dapp"
-  },
+/** Decorative fallbacks — real screenshots in public/project/ win via project.image. */
+const FALLBACK_IMAGES = [
+  "/project/parallax/image1.webp",
+  "/project/parallax/image2.webp",
+  "/project/parallax/image3.webp",
+  "/project/parallax/image4.webp",
+  "/project/parallax/image5.webp",
 ];
+
+/**
+ * Derived from portfolioData so this stays in sync — it used to hardcode its
+ * own copy of the project list, which left dead links when projects changed.
+ */
+const PROJECT_DATA: ProjectData[] = portfolioData.projects.map((p, i) => ({
+  title: p.title,
+  image: p.image || FALLBACK_IMAGES[i % FALLBACK_IMAGES.length],
+  category: p.category || "Product",
+  year: p.customTimeline || new Date(p.startDate).getFullYear().toString(),
+  description: p.description,
+  slug: p.slug,
+}));
 
 export function ArgentLoopInfiniteSlider() {
   const containerRef = React.useRef<HTMLDivElement>(null);
