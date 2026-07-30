@@ -91,6 +91,12 @@
     position: relative;
     min-height: 100%;
     background: hsl(var(--background));
+    /*
+     * Always the layout "window" for Tailwind sm/md/lg/xl/2xl
+     * (see tailwind.config.ts → @container marvin-shell).
+     */
+    container-type: inline-size;
+    container-name: marvin-shell;
   }
 
   /*
@@ -130,8 +136,8 @@
     -ms-overflow-style: none;
     /* Containing block so fixed navbar stays inside the rounded frame */
     transform: translate3d(0, 0, 0);
-    container-type: inline-size;
-    container-name: marvin-shell;
+    /* Definite fixed box — enable cqh for fluid height inside the frame */
+    container-type: size;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
     transition:
       top 0.35s cubic-bezier(0.16, 1, 0.3, 1),
@@ -180,6 +186,14 @@
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
+  }
+
+  /* Home: fill the framed shell when split (not mobile overlay) */
+  html[data-marvin-open="true"]:not([data-marvin-overlay="true"]) .marvin-home-frame {
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden;
   }
 
   /* Hide chat scrollbars while Marvin is open (scroll still works) */

@@ -52,7 +52,7 @@ export default function HomePage() {
                     ease: skipAnimation ? "linear" : [0.16, 1, 0.3, 1],
                     opacity: { duration: skipAnimation ? 0 : 0.8 }
                 }}
-                className="relative will-change-transform will-change-opacity lg:h-[100dvh] lg:overflow-hidden"
+                className="marvin-home-frame relative will-change-transform will-change-opacity lg:h-[100dvh] lg:overflow-hidden"
             >
                 <HeroVisual isExiting={isReadyToAnimate} />
             </motion.main>

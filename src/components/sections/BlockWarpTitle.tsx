@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
-import { BREAKPOINTS } from '@/lib/breakpoints';
+import { getFrameHeight, getFrameWidth, isLgUp } from '@/lib/breakpoints';
 
 /**
  * Physics pattern adapted from:
@@ -35,11 +35,15 @@ interface BlockWarpTitleProps {
   interactive?: boolean;
 }
 
-function resolveFontSize(explicit?: number) {
+/** Same formula — inputs are frame (shell) size, not the browser window. */
+function resolveFontSize(
+  explicit?: number,
+  bounds?: { width: number; height: number },
+) {
   if (explicit) return explicit;
   if (typeof window === 'undefined') return 176;
-  const w = window.innerWidth;
-  const h = window.innerHeight;
+  const w = bounds?.width ?? getFrameWidth();
+  const h = bounds?.height ?? getFrameHeight();
   const aspect = w / Math.max(1, h);
   // Wide: slight width dampen only — keep titles large; height still caps overflow
   const widthFactor = aspect > 1.85 ? 0.09 : aspect > 1.55 ? 0.1 : 0.11;
@@ -193,8 +197,12 @@ export function BlockWarpTitle({
 
     const mouse = { x: -9999, y: -9999, active: false };
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const desktopQuery = window.matchMedia(`(min-width: ${BREAKPOINTS.LG}px)`);
     const fontFamily = resolveCanvasFont();
+    const frameBounds = () => ({
+      width: getFrameWidth(),
+      height: getFrameHeight(),
+    });
+    const isDesktopFrame = () => isLgUp(getFrameWidth());
 
     const isDark =
       resolvedTheme === 'dark' ||
@@ -239,13 +247,14 @@ export function BlockWarpTitle({
     };
 
     const layout = () => {
-      if (!desktopQuery.matches) {
+      // Desktop band follows shell width (same threshold as lg: container query)
+      if (!isDesktopFrame()) {
         active = false;
         teardownLoop();
         return;
       }
 
-      fontSize = resolveFontSize(fontSizeProp);
+      fontSize = resolveFontSize(fontSizeProp, frameBounds());
       const built = buildParticles(text, fontSize, fontFamily);
       const result =
         built.particles.length > 20
@@ -380,7 +389,9 @@ export function BlockWarpTitle({
     const boot = async () => {
       try {
         await document.fonts.ready;
-        await document.fonts.load(`900 ${resolveFontSize(fontSizeProp)}px ${fontFamily}`);
+        await document.fonts.load(
+          `900 ${resolveFontSize(fontSizeProp, frameBounds())}px ${fontFamily}`,
+        );
       } catch {
         /* ignore */
       }
@@ -393,18 +404,24 @@ export function BlockWarpTitle({
 
     boot();
 
+    const shell = document.getElementById('marvin-page-shell');
+    const shellRo =
+      typeof ResizeObserver !== 'undefined' && shell
+        ? new ResizeObserver(() => layout())
+        : null;
+    shellRo?.observe(shell);
+
     window.addEventListener('resize', layout);
     window.addEventListener('pointermove', onPointerMove, { passive: true });
     window.addEventListener('blur', onPointerLeaveWindow);
-    desktopQuery.addEventListener('change', layout);
 
     return () => {
       disposed = true;
       cancelAnimationFrame(raf);
+      shellRo?.disconnect();
       window.removeEventListener('resize', layout);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('blur', onPointerLeaveWindow);
-      desktopQuery.removeEventListener('change', layout);
     };
   }, [text, fontSizeProp, interactive, resolvedTheme]);
 

@@ -147,13 +147,9 @@ export function ProjectStats({ isLowPowerMode }: { isLowPowerMode?: boolean }) {
                         </span>
                     </motion.div>
 
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-foreground mb-3">
-                        Building The Future
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-foreground mb-3">
+                        Work I&apos;m <span className="text-[#D1FF4D]">Proud</span> Of
                     </h2>
-
-                    <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-                        Transforming ideas into production-ready solutions that drive real-world impact
-                    </p>
                 </motion.div>
 
                 {/* Stats Grid */}

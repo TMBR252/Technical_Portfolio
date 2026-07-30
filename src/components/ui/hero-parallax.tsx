@@ -93,7 +93,7 @@ export const HeroParallax = ({
           onUpdate: (self) => {
             setImagesClickable(self.progress > 0.02);
           },
-          // Collapse spent hero so Building The Future isn't parked under a black band
+          // Collapse spent hero so the title block isn't parked under a black band
           onLeave: () => {
             gsap.set(stage, { height: 0, overflow: "hidden" });
             gsap.set(track, { height: 0, overflow: "hidden" });
@@ -195,13 +195,9 @@ export const HeroParallax = ({
       <section className="relative z-10 bg-background px-4 py-10 sm:px-6 sm:py-12 md:px-8 md:py-14">
         <div className="container-creative text-center">
           <div className="flex flex-col items-center gap-4">
-            <h2 className="text-3xl font-black tracking-tight text-foreground sm:text-4xl md:text-5xl">
-              Building The Future
+            <h2 className="text-3xl font-black uppercase tracking-tight text-foreground sm:text-4xl md:text-5xl">
+              Work I&apos;m <span className="text-[#D1FF4D]">Proud</span> Of
             </h2>
-            <p className="max-w-2xl text-base leading-6 text-muted-foreground sm:text-lg sm:leading-7">
-              Transforming ideas into production-ready solutions that drive
-              real-world impact
-            </p>
           </div>
         </div>
       </section>
@@ -222,12 +218,9 @@ export const Header = ({
       className="pointer-events-none absolute inset-x-0 top-0 z-20 flex h-full w-full flex-col items-center justify-center px-4 pt-[18vh] text-center will-change-transform md:pt-[20vh]"
     >
       <div className="pointer-events-auto mx-auto flex w-full max-w-7xl flex-col items-center">
-        <h1 className="text-2xl font-bold dark:text-white md:text-7xl">
-          {t("title")}
-        </h1>
-        <p
-          className="mx-auto mt-8 max-w-2xl text-center text-base dark:text-neutral-200 md:text-xl"
-          dangerouslySetInnerHTML={{ __html: t.raw("subtitle") }}
+        <h1
+          className="text-2xl font-bold uppercase tracking-tight dark:text-white md:text-6xl lg:text-7xl"
+          dangerouslySetInnerHTML={{ __html: t.raw("title") }}
         />
 
         <motion.div

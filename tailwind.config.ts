@@ -1,4 +1,15 @@
 import type { Config } from 'tailwindcss';
+import plugin from 'tailwindcss/plugin';
+import { BREAKPOINTS } from './src/lib/breakpoints';
+
+/** Same px as breakpoints.ts — used for frame-container + viewport escape hatches */
+const SCREEN_PX = {
+	sm: BREAKPOINTS.SM,
+	md: BREAKPOINTS.MD,
+	lg: BREAKPOINTS.LG,
+	xl: BREAKPOINTS.XL,
+	'2xl': BREAKPOINTS.XXL,
+} as const;
 
 const config: Config = {
 	content: [
@@ -8,7 +19,18 @@ const config: Config = {
 	],
 	darkMode: 'class',
 	theme: {
+		// Empty: disable default @media sm/md/lg variants.
+		// Breakpoints are re-registered as @container marvin-shell queries below.
+		screens: {},
 		extend: {
+			// Preserve max-w-screen-* utilities (normally derived from theme.screens)
+			maxWidth: {
+				'screen-sm': `${SCREEN_PX.sm}px`,
+				'screen-md': `${SCREEN_PX.md}px`,
+				'screen-lg': `${SCREEN_PX.lg}px`,
+				'screen-xl': `${SCREEN_PX.xl}px`,
+				'screen-2xl': `${SCREEN_PX['2xl']}px`,
+			},
 			colors: {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
@@ -239,7 +261,24 @@ const config: Config = {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [
+		require('tailwindcss-animate'),
+		plugin(function frameAsWindowBreakpoints({ addVariant }) {
+			const entries = Object.entries(SCREEN_PX) as [keyof typeof SCREEN_PX, number][];
+
+			// In-shell layout: md:/lg:/… follow #marvin-page-shell width (frame = window)
+			for (const [name, px] of entries) {
+				addVariant(name, `@container marvin-shell (min-width: ${px}px)`);
+				addVariant(`max-${name}`, `@container marvin-shell (max-width: ${px - 1}px)`);
+			}
+
+			// Outside-shell chrome (ChatBot): real device viewport
+			for (const [name, px] of entries) {
+				addVariant(`v${name}`, `@media (min-width: ${px}px)`);
+				addVariant(`vmax-${name}`, `@media (max-width: ${px - 1}px)`);
+			}
+		}),
+	],
 };
 
 export default config;

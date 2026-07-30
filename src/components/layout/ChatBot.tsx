@@ -17,7 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 import { portfolioData } from "@/data/portfolio";
 import { useTranslations, useLocale } from "next-intl";
-import { BREAKPOINTS, isBelowMd } from "@/lib/breakpoints";
+import { BREAKPOINTS, getViewportWidth, isBelowMd } from "@/lib/breakpoints";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Message {
@@ -270,26 +270,26 @@ const MARVIN_MAX_RATIO = 0.3;
 const MARVIN_MIN_PX = 280;
 const MARVIN_DEFAULT_PX = 360;
 
-function getMarvinMaxWidth(viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1200) {
+function getMarvinMaxWidth(viewportWidth = getViewportWidth()) {
     if (isBelowMd(viewportWidth)) {
         return Math.max(240, viewportWidth - MARVIN_INSET * 2);
     }
     return Math.floor(viewportWidth * MARVIN_MAX_RATIO);
 }
 
-function getMarvinMinWidth(viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1200) {
+function getMarvinMinWidth(viewportWidth = getViewportWidth()) {
     const max = getMarvinMaxWidth(viewportWidth);
     if (isBelowMd(viewportWidth)) return max;
     return Math.min(MARVIN_MIN_PX, max);
 }
 
-function clampMarvinWidth(width: number, viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1200) {
+function clampMarvinWidth(width: number, viewportWidth = getViewportWidth()) {
     const min = getMarvinMinWidth(viewportWidth);
     const max = getMarvinMaxWidth(viewportWidth);
     return Math.min(max, Math.max(min, Math.round(width)));
 }
 
-function defaultMarvinWidth(viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1200) {
+function defaultMarvinWidth(viewportWidth = getViewportWidth()) {
     if (isBelowMd(viewportWidth)) return getMarvinMaxWidth(viewportWidth);
     if (viewportWidth < BREAKPOINTS.LG) {
         return clampMarvinWidth(Math.floor(viewportWidth * 0.28), viewportWidth);
@@ -608,11 +608,11 @@ function ChatWindow({
                 aria-label="Marvin chat panel"
             >
                 {/* Header — keep content aligned with navbar; tighter bottom so the rule sits higher */}
-                <div className="flex-shrink-0 border-b border-foreground/8 bg-foreground/3 px-4 md:px-5 pt-4 md:pt-6 pb-2">
+                <div className="flex-shrink-0 border-b border-foreground/8 bg-foreground/3 px-4 vmd:px-5 pt-4 vmd:pt-6 pb-2">
                     <div className="flex items-center justify-between gap-3 py-2">
                         <div className="flex items-center gap-2.5 min-w-0">
                             <div className="relative flex-shrink-0">
-                                <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-primary/15 border border-primary/25 flex items-center justify-center">
+                                <div className="w-9 h-9 vmd:w-10 vmd:h-10 rounded-full bg-primary/15 border border-primary/25 flex items-center justify-center">
                                     <Bot className="w-4 h-4 text-primary" />
                                 </div>
                                 <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-background" />
@@ -628,7 +628,7 @@ function ChatWindow({
                             <button
                                 type="button"
                                 onClick={resetChat}
-                                className="p-2 md:p-2.5 rounded-full bg-transparent hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-300 text-foreground hover:scale-110"
+                                className="p-2 vmd:p-2.5 rounded-full bg-transparent hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-300 text-foreground hover:scale-110"
                                 aria-label={t("resetChat")}
                                 title={t("resetChat")}
                             >
@@ -637,7 +637,7 @@ function ChatWindow({
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="p-2 md:p-2.5 rounded-full bg-transparent hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-300 text-foreground hover:scale-110"
+                                className="p-2 vmd:p-2.5 rounded-full bg-transparent hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-300 text-foreground hover:scale-110"
                                 aria-label={t("close")}
                             >
                                 <X className="w-4 h-4" />
@@ -829,7 +829,7 @@ export function ChatBot({ headless = false }: { headless?: boolean }) {
     useEffect(() => {
         const syncWidth = () => {
             setPanelWidth((prev) =>
-                isBelowMd() ? getMarvinMaxWidth() : clampMarvinWidth(prev)
+                isBelowMd(getViewportWidth()) ? getMarvinMaxWidth() : clampMarvinWidth(prev)
             );
         };
         syncWidth();
@@ -845,7 +845,7 @@ export function ChatBot({ headless = false }: { headless?: boolean }) {
     // Inset split (md+) vs overlay (mobile): layout effect = before paint
     useLayoutEffect(() => {
         const root = document.documentElement;
-        const mobile = isBelowMd();
+        const mobile = isBelowMd(getViewportWidth());
 
         if (isOpen) {
             root.dataset.marvinOpen = "true";
@@ -904,7 +904,7 @@ export function ChatBot({ headless = false }: { headless?: boolean }) {
     // Resize drag lives in the gap (outside chat overflow), so it isn't clipped
     const handleResizePointerDown = useCallback(
         (e: React.PointerEvent<HTMLDivElement>) => {
-            if (isBelowMd()) return;
+            if (isBelowMd(getViewportWidth())) return;
             e.preventDefault();
             e.stopPropagation();
             setIsDragging(true);
@@ -971,7 +971,7 @@ export function ChatBot({ headless = false }: { headless?: boolean }) {
                     aria-valuenow={panelWidth}
                     onPointerDown={handleResizePointerDown}
                     className={cn(
-                        "fixed z-[130] hidden md:flex items-center justify-center",
+                        "fixed z-[130] hidden vmd:flex items-center justify-center",
                         "cursor-col-resize touch-none select-none"
                     )}
                     style={{
