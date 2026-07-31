@@ -97,7 +97,7 @@ function buildParticles(
   probeCtx.font = font;
   applyCanvasLetterSpacing(probeCtx, letterSpacingEm, fontSize);
   const measured = probeCtx.measureText(text);
-  const supportsLetterSpacing = 'letterSpacing' in probeCtx;
+  const supportsLetterSpacing = 'letterSpacing' in (probeCtx as CanvasRenderingContext2D & { letterSpacing?: string });
   const letterSpacing = fontSize * letterSpacingEm;
   const textWidth = Math.max(
     fontSize,
@@ -409,7 +409,7 @@ export function BlockWarpTitle({
       typeof ResizeObserver !== 'undefined' && shell
         ? new ResizeObserver(() => layout())
         : null;
-    shellRo?.observe(shell);
+    if (shell) shellRo?.observe(shell);
 
     window.addEventListener('resize', layout);
     window.addEventListener('pointermove', onPointerMove, { passive: true });
