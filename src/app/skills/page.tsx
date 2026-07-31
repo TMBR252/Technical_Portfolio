@@ -43,18 +43,12 @@ const NINJA_BACKDROP_KEY: BackdropKey = {
     color: [230, 239, 233],
 };
 
-/**
- * Cursor-position → clip-time, sampled at even steps of the character's head
- * yaw. The turn does not rotate at a constant rate, so mapping the cursor
- * straight onto duration would sweep most of the rotation across a narrow band
- * of the screen. Measured off the clip; both ends are the rotation limits and
- * the midpoint puts the character facing straight ahead.
+/*
+ * The clip itself is resampled to even steps of head yaw — frame 0 is the full
+ * left profile, the middle frame faces straight ahead, the last is the full
+ * right turn. Cursor position therefore maps straight onto time, with no
+ * correction curve in between.
  */
-const NINJA_TURN_TIME_MAP = [
-    0, 0.0963, 0.1166, 0.1275, 0.1397, 0.1502, 0.1625, 0.1867, 0.2171,
-    0.2338, 0.246, 0.2566, 0.2681, 0.2795, 0.2875, 0.2961, 0.3057, 0.3144,
-    0.3241, 0.336, 0.3739, 0.3964, 0.4137, 0.5519, 0.6667,
-];
 
 function TechSchematic() {
     return (
@@ -218,10 +212,9 @@ export default function SkillsPage() {
                             pointerSource="window"
                             axis="x"
                             smoothing={12}
-                            maxSeekFps={30}
-                            minimumSeekDistance={1 / 96}
+                            maxSeekFps={24}
+                            minimumSeekDistance={1 / 72}
                             initialProgress={0.5}
-                            timeMap={NINJA_TURN_TIME_MAP}
                             backdropKey={NINJA_BACKDROP_KEY}
                         />
                     </DeferredMount>

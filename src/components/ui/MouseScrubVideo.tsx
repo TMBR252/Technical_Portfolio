@@ -53,6 +53,8 @@ export type BackdropKey = {
      */
     enclosedLo?: number;
     enclosedHi?: number;
+    /** Beyond this RGB distance a pixel is solid subject; skips the chroma maths. */
+    subjectDistance?: number;
 };
 
 type MouseScrubVideoProps = {
@@ -184,6 +186,7 @@ export default function MouseScrubVideo({
             groundChromaHi = 0.05,
             enclosedLo = 40,
             enclosedHi = 80,
+            subjectDistance = 255,
         } = backdropKey;
 
         const [bgR, bgG, bgB] = color;
@@ -192,6 +195,7 @@ export default function MouseScrubVideo({
         const bgCg = bgG / bgSum;
         const bgCb = bgB / bgSum;
         const nearSq = nearDistance * nearDistance;
+        const subjectSq = subjectDistance * subjectDistance;
         const groundRow = Math.floor(groundStart * h);
 
         const frame = ctx.getImageData(0, 0, w, h);
@@ -212,11 +216,14 @@ export default function MouseScrubVideo({
                 const dr = r - bgR;
                 const dg = g - bgG;
                 const db = b - bgB;
-                // Fast path: the backdrop is most of the frame, so bail early.
-                if (dr * dr + dg * dg + db * db < nearSq) {
+                const dist2 = dr * dr + dg * dg + db * db;
+                // Most of the frame is backdrop, and most of the rest is solid
+                // subject. Both bail before the per-pixel divides below.
+                if (dist2 < nearSq) {
                     data[i + 3] = 0;
                     continue;
                 }
+                if (dist2 > subjectSq) continue; // already opaque
 
                 const sum = r + g + b || 1;
                 // Chromaticity distance — the shadow keeps the backdrop's tint,
@@ -234,7 +241,7 @@ export default function MouseScrubVideo({
                     luma >= lumaHi ? 0 : luma <= lumaLo ? 1 : (lumaHi - luma) / (lumaHi - lumaLo);
 
                 const alpha = chromaKeep > darkKeep ? chromaKeep : darkKeep;
-                data[i + 3] = alpha * 255;
+                if (alpha < 1) data[i + 3] = alpha * 255;
             }
         }
 
@@ -287,6 +294,24 @@ export default function MouseScrubVideo({
 
             const restored = solid * 255;
             if (restored > data[i + 3]) data[i + 3] = restored;
+        }
+
+        // Un-mix the backdrop out of partially transparent edge pixels. They are
+        // a blend of subject and backdrop, so compositing them as-is leaves a
+        // pale fringe around the silhouette — very visible on a dark page.
+        // observed = subject*a + backdrop*(1-a)  =>  subject = (observed - backdrop*(1-a))/a
+        for (let p = 0; p < count; p++) {
+            const i = p * 4;
+            const a = data[i + 3];
+            if (a === 0 || a === 255) continue;
+
+            const af = a / 255;
+            const rest = 1 - af;
+            // ImageData is straight (non-premultiplied) alpha, so solve for the
+            // subject colour directly. Out-of-gamut results clamp on write.
+            data[i] = (data[i] - bgR * rest) / af;
+            data[i + 1] = (data[i + 1] - bgG * rest) / af;
+            data[i + 2] = (data[i + 2] - bgB * rest) / af;
         }
 
         ctx.putImageData(frame, 0, 0);
