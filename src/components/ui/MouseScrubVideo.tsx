@@ -58,6 +58,17 @@ type MouseScrubVideoProps = {
     /** Trim unusable time at either end of the clip. */
     startPadding?: number;
     endPadding?: number;
+    /**
+     * Absolute timestamps, evenly spaced across progress 0→1, used instead of
+     * mapping progress linearly onto duration.
+     *
+     * A turnaround rarely rotates at a constant rate, so equal cursor travel
+     * would otherwise produce unequal rotation — the character races through
+     * one half of the sweep and crawls through the other. Sampling the clip at
+     * even angular steps and storing those times here makes rotation track the
+     * cursor evenly.
+     */
+    timeMap?: number[];
     /** Resting position, 0–1. */
     initialProgress?: number;
     /** Which pointer axis drives the scrub. */
@@ -88,6 +99,7 @@ export default function MouseScrubVideo({
     minimumSeekDistance = 1 / 24,
     startPadding = 0,
     endPadding = 0,
+    timeMap,
     initialProgress = 0.5,
     axis = 'x',
     reversed = false,
@@ -117,8 +129,15 @@ export default function MouseScrubVideo({
     const [isReady, setIsReady] = useState(false);
 
     const getVideoTime = useCallback(
-        (progress: number) => startPadding + clamp(progress, 0, 1) * durationRef.current,
-        [startPadding],
+        (progress: number) => {
+            const p = clamp(progress, 0, 1);
+            if (!timeMap || timeMap.length < 2) return startPadding + p * durationRef.current;
+
+            const scaled = p * (timeMap.length - 1);
+            const i = Math.min(timeMap.length - 2, Math.floor(scaled));
+            return timeMap[i] + (timeMap[i + 1] - timeMap[i]) * (scaled - i);
+        },
+        [startPadding, timeMap],
     );
 
     /** Paint the current frame, keying the backdrop out when configured. */
