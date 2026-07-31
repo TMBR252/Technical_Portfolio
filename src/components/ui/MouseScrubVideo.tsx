@@ -55,6 +55,12 @@ export type BackdropKey = {
     enclosedHi?: number;
     /** Beyond this RGB distance a pixel is solid subject; skips the chroma maths. */
     subjectDistance?: number;
+    /**
+     * Luma above which a pixel is brighter than the backdrop itself. The render
+     * carries a faint glow just outside the silhouette; left in, un-mixing
+     * divides it by a small alpha and clamps it to white, drawing a bright rim.
+     */
+    haloLuma?: number;
 };
 
 type MouseScrubVideoProps = {
@@ -187,6 +193,7 @@ export default function MouseScrubVideo({
             enclosedLo = 40,
             enclosedHi = 80,
             subjectDistance = 255,
+            haloLuma = 220,
         } = backdropKey;
 
         const [bgR, bgG, bgB] = color;
@@ -225,6 +232,12 @@ export default function MouseScrubVideo({
                 }
                 if (dist2 > subjectSq) continue; // already opaque
 
+                const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+                if (luma > haloLuma) {
+                    data[i + 3] = 0;
+                    continue;
+                }
+
                 const sum = r + g + b || 1;
                 // Chromaticity distance — the shadow keeps the backdrop's tint,
                 // so it collapses to ~0 here while the subject does not.
@@ -236,11 +249,22 @@ export default function MouseScrubVideo({
                 const chromaKeep =
                     chroma <= cLo ? 0 : chroma >= cHi ? 1 : (chroma - cLo) / cSpan;
 
-                const luma = 0.299 * r + 0.587 * g + 0.114 * b;
                 const darkKeep =
                     luma >= lumaHi ? 0 : luma <= lumaLo ? 1 : (lumaHi - luma) / (lumaHi - lumaLo);
 
-                const alpha = chromaKeep > darkKeep ? chromaKeep : darkKeep;
+                // Chroma and darkness decide *whether* a pixel is subject; they
+                // are near-binary, which on 4:2:0 chroma gives a blocky, chewed
+                // edge. Distance supplies the sub-pixel coverage a partly
+                // covered edge pixel actually has, at full luma resolution.
+                const cover = (Math.sqrt(dist2) - nearDistance) / (subjectDistance - nearDistance);
+                const coverKeep = cover <= 0 ? 0 : cover >= 1 ? 1 : cover;
+
+                // Not on the ground plane though: the contact shadow sits at a
+                // real distance from the backdrop, so coverage would revive it.
+                // There the chroma/darkness verdict stands, and the feet get
+                // their soft edge from the luma ramp instead.
+                let alpha = chromaKeep > darkKeep ? chromaKeep : darkKeep;
+                if (!onGround && coverKeep > alpha) alpha = coverKeep;
                 if (alpha < 1) data[i + 3] = alpha * 255;
             }
         }
@@ -303,7 +327,9 @@ export default function MouseScrubVideo({
         for (let p = 0; p < count; p++) {
             const i = p * 4;
             const a = data[i + 3];
-            if (a === 0 || a === 255) continue;
+            // Below ~15% coverage the division blows up any noise in the pixel,
+            // and its contribution to the composite is negligible anyway.
+            if (a < 38 || a === 255) continue;
 
             const af = a / 255;
             const rest = 1 - af;

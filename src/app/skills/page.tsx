@@ -211,8 +211,8 @@ export default function SkillsPage() {
                                facing the cursor even over the headline that sits on top. */
                             pointerSource="window"
                             axis="x"
-                            smoothing={12}
-                            maxSeekFps={24}
+                            smoothing={30}
+                            maxSeekFps={30}
                             minimumSeekDistance={1 / 72}
                             initialProgress={0.5}
                             backdropKey={NINJA_BACKDROP_KEY}
