@@ -50,6 +50,13 @@ const NINJA_BACKDROP_KEY: BackdropKey = {
  * correction curve in between.
  */
 
+/**
+ * Show only the Core Technologies section. Everything else on the page — the
+ * hero, the carousel, hard skills, tools and the feature stack — is left in
+ * place but not rendered. Flip to false to bring the full page back.
+ */
+const SHOW_ONLY_CORE_TECH = true;
+
 function TechSchematic() {
     return (
         <div className="absolute inset-0 z-0 pointer-events-none">
@@ -197,6 +204,7 @@ export default function SkillsPage() {
         >
             <TechSchematic />
 
+            {!SHOW_ONLY_CORE_TECH && (
             <section className="relative h-[100dvh] flex items-end justify-center overflow-hidden pb-16">
                 <motion.div
                     className="absolute inset-0 z-0"
@@ -316,16 +324,21 @@ export default function SkillsPage() {
                     />
                 </motion.div>
             </section>
+            )}
 
-            {/* VAPOR TRANSITION */}
-            <div className="relative h-64 -mt-32 z-20 pointer-events-none">
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background" />
-                <VaporFog className="opacity-30" />
-            </div>
+            {!SHOW_ONLY_CORE_TECH && (
+            <>
+                {/* VAPOR TRANSITION */}
+                <div className="relative h-64 -mt-32 z-20 pointer-events-none">
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background" />
+                    <VaporFog className="opacity-30" />
+                </div>
+            </>
+            )}
 
             <DeferredMount>
-                <HorizontalScrollCarousel />
-                <HardSkills />
+                {!SHOW_ONLY_CORE_TECH && <HorizontalScrollCarousel />}
+                {!SHOW_ONLY_CORE_TECH && <HardSkills />}
                 <section className="pt-12 pb-48 px-8 relative overflow-hidden bg-background">
                     <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
                     </div>
@@ -379,8 +392,8 @@ export default function SkillsPage() {
                     </div>
                 </section>
 
-                <ToolsSection />
-                <FeatureSection />
+                {!SHOW_ONLY_CORE_TECH && <ToolsSection />}
+                {!SHOW_ONLY_CORE_TECH && <FeatureSection />}
             </DeferredMount>
 
         </div>
