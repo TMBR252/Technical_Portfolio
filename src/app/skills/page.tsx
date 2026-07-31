@@ -40,7 +40,7 @@ const techLogos: Record<string, string> = {
  * reference stable so the scrub component doesn't rebuild its paint loop.
  */
 const NINJA_BACKDROP_KEY: BackdropKey = {
-    color: [229, 239, 234],
+    color: [230, 239, 233],
 };
 
 /**
@@ -51,9 +51,9 @@ const NINJA_BACKDROP_KEY: BackdropKey = {
  * the midpoint puts the character facing straight ahead.
  */
 const NINJA_TURN_TIME_MAP = [
-    0, 0.0972, 0.115, 0.1248, 0.1344, 0.1426, 0.1521, 0.1645, 0.2115,
-    0.2318, 0.245, 0.2572, 0.2728, 0.2827, 0.2913, 0.3026, 0.3128, 0.3226,
-    0.3374, 0.3624, 0.3875, 0.4149, 0.5467, 0.6601, 0.75,
+    0, 0.0963, 0.1166, 0.1275, 0.1397, 0.1502, 0.1625, 0.1867, 0.2171,
+    0.2338, 0.246, 0.2566, 0.2681, 0.2795, 0.2875, 0.2961, 0.3057, 0.3144,
+    0.3241, 0.336, 0.3739, 0.3964, 0.4137, 0.5519, 0.6667,
 ];
 
 function TechSchematic() {

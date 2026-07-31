@@ -43,6 +43,16 @@ export type BackdropKey = {
     groundStart?: number;
     groundChromaLo?: number;
     groundChromaHi?: number;
+    /**
+     * Guards detail that is enclosed by the subject. The eye whites are bright
+     * and near-neutral, so a purely colour-based test reads them as backdrop
+     * and eats holes in them. Anything the backdrop cannot reach by flooding in
+     * from the frame edge is therefore treated as subject — except where it is
+     * within this RGB distance of the backdrop, which marks a real gap seen
+     * through the body (between blade and shoulder, say) that must stay clear.
+     */
+    enclosedLo?: number;
+    enclosedHi?: number;
 };
 
 type MouseScrubVideoProps = {
@@ -125,6 +135,8 @@ export default function MouseScrubVideo({
     const seekingRef = useRef(false);
     const destroyedRef = useRef(false);
     const reducedMotionRef = useRef(false);
+    // Reused across paints — reallocating these per frame would churn the GC.
+    const scratchRef = useRef<{ reach: Uint8Array; stack: Int32Array } | null>(null);
 
     const [isReady, setIsReady] = useState(false);
 
@@ -170,6 +182,8 @@ export default function MouseScrubVideo({
             groundStart = 0.84,
             groundChromaLo = 0.03,
             groundChromaHi = 0.05,
+            enclosedLo = 40,
+            enclosedHi = 80,
         } = backdropKey;
 
         const [bgR, bgG, bgB] = color;
@@ -220,8 +234,59 @@ export default function MouseScrubVideo({
                     luma >= lumaHi ? 0 : luma <= lumaLo ? 1 : (lumaHi - luma) / (lumaHi - lumaLo);
 
                 const alpha = chromaKeep > darkKeep ? chromaKeep : darkKeep;
-                if (alpha < 1) data[i + 3] = alpha * 255;
+                data[i + 3] = alpha * 255;
             }
+        }
+
+        // Flood the transparency in from the frame edge. Only what the backdrop
+        // can actually reach is backdrop; enclosed detail is subject.
+        const count = w * h;
+        let scratch = scratchRef.current;
+        if (!scratch || scratch.reach.length !== count) {
+            scratch = { reach: new Uint8Array(count), stack: new Int32Array(count) };
+            scratchRef.current = scratch;
+        }
+        const { reach, stack } = scratch;
+        reach.fill(0);
+
+        let sp = 0;
+        const push = (i: number) => {
+            if (!reach[i] && data[i * 4 + 3] < 255) {
+                reach[i] = 1;
+                stack[sp++] = i;
+            }
+        };
+        for (let x = 0; x < w; x++) {
+            push(x);
+            push((h - 1) * w + x);
+        }
+        for (let y = 0; y < h; y++) {
+            push(y * w);
+            push(y * w + w - 1);
+        }
+        while (sp > 0) {
+            const i = stack[--sp];
+            const x = i % w;
+            if (x > 0) push(i - 1);
+            if (x < w - 1) push(i + 1);
+            if (i >= w) push(i - w);
+            if (i < count - w) push(i + w);
+        }
+
+        const encSpan = enclosedHi - enclosedLo || 1;
+        for (let p = 0; p < count; p++) {
+            const i = p * 4;
+            if (reach[p] || data[i + 3] === 255) continue;
+
+            const dr = data[i] - bgR;
+            const dg = data[i + 1] - bgG;
+            const db = data[i + 2] - bgB;
+            const dist = Math.sqrt(dr * dr + dg * dg + db * db);
+            const solid =
+                dist <= enclosedLo ? 0 : dist >= enclosedHi ? 1 : (dist - enclosedLo) / encSpan;
+
+            const restored = solid * 255;
+            if (restored > data[i + 3]) data[i + 3] = restored;
         }
 
         ctx.putImageData(frame, 0, 0);
