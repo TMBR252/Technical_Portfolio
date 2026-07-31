@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useAnimationFrame, useMotionValue } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { portfolioData } from '@/data/portfolio';
-import { SplineScene } from '@/components/ui/SplineScene';
+import MouseScrubVideo, { type BackdropKey } from '@/components/ui/MouseScrubVideo';
 import { TextPressure } from '@/components/ui/TextPressure';
 import { KineticTechGrid } from '@/components/ui/KineticTechGrid';
 import { ArchedTechIconsInteractive } from '@/components/ui/ArchedTechIcons';
@@ -33,6 +33,14 @@ const techLogos: Record<string, string> = {
     'Scikit-learn': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/scikitlearn/scikitlearn-original.svg',
     'Pandas': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pandas/pandas-original.svg',
     'NumPy': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/numpy/numpy-original.svg',
+};
+
+/**
+ * Measured off the source clip's flat studio backdrop. Module scope keeps the
+ * reference stable so the scrub component doesn't rebuild its paint loop.
+ */
+const NINJA_BACKDROP_KEY: BackdropKey = {
+    color: [229, 239, 234],
 };
 
 function TechSchematic() {
@@ -188,9 +196,19 @@ export default function SkillsPage() {
                     style={{ y: yHeroSpline, scale: scaleSpline, willChange: 'transform' }}
                 >
                     <DeferredMount fallback={<div className="w-full h-full opacity-10 bg-zinc-800 animate-pulse" />}>
-                        <SplineScene
-                            scene="https://prod.spline.design/qVnpleqGGhqRlQYK/scene.splinecode"
+                        <MouseScrubVideo
+                            src="/videos/ninja.mp4"
                             className="w-full h-full opacity-60 md:opacity-100"
+                            style={{ padding: '6vh 0 14vh' }}
+                            /* Pointer is tracked viewport-wide so the character keeps
+                               facing the cursor even over the headline that sits on top. */
+                            pointerSource="window"
+                            axis="x"
+                            smoothing={12}
+                            maxSeekFps={30}
+                            minimumSeekDistance={1 / 24}
+                            initialProgress={0.5}
+                            backdropKey={NINJA_BACKDROP_KEY}
                         />
                     </DeferredMount>
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/60 to-background pointer-events-none" />
