@@ -251,18 +251,19 @@ export const ProductCard = ({
     <motion.div
       whileHover={isLowPowerMode ? {} : { y: -20 }}
       className={cn(
-        "group/product relative shrink-0",
-        isLowPowerMode
-          ? "h-48 w-[12rem] md:h-64 md:w-[20rem]"
-          : "h-64 w-[16rem] md:h-96 md:w-[30rem]"
+        // 16:9 — these are web projects, so the tiles are shaped like the
+        // browser screenshots that fill them. Height derives from width so
+        // the frame matches the asset instead of cropping it into portrait.
+        "group/product relative aspect-video shrink-0",
+        isLowPowerMode ? "w-[12rem] md:w-[20rem]" : "w-[16rem] md:w-[30rem]"
       )}
     >
       <Link href={product.href} className="block group-hover/product:shadow-2xl">
         <Image
           src={product.thumbnail}
-          height={600}
-          width={600}
-          className="absolute inset-0 h-full w-full object-cover object-left-top"
+          height={540}
+          width={960}
+          className="absolute inset-0 h-full w-full object-cover object-center"
           alt={product.title}
           priority
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
