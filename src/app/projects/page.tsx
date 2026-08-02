@@ -643,12 +643,22 @@ export default function ProjectsPage() {
         const source = portfolioData.projects;
         if (source.length === 0) return [];
 
+        // A project with a real screenshot shows it on its first tile, so the
+        // collage leads with actual work where it exists. Later tiles for the
+        // same project keep the decorative art rather than repeating the
+        // screenshot, since a duplicated screenshot reads as a mistake in a
+        // way duplicated abstract art does not.
+        const claimed = new Set<string>();
+
         return techImages.map((thumbnail, i) => {
             const p = source[i % source.length];
+            const useRealImage = p.image && !claimed.has(p.id);
+            if (useRealImage) claimed.add(p.id);
+
             return {
                 title: p.title,
                 href: `/projects/${p.slug}`,
-                thumbnail,
+                thumbnail: useRealImage ? p.image! : thumbnail,
             };
         });
     }, []);
