@@ -85,6 +85,47 @@ export const portfolioData: PortfolioData = {
             ],
         },
         {
+            id: 'primer-landing',
+            slug: 'primer-landing-page',
+            title: 'Primer',
+            description:
+                'The landing page for Primer, the Primitive product — an address in, a feasibility answer out, in under a minute.',
+            longDescription:
+                'Designed and built primer.city, the marketing surface for Primer, the Primitive product. The page leads with the product itself rather than a description of it: a live address search sits directly in the hero, so the first interaction a visitor has is the same one the product is built around — type a property address, get a feasibility read back. Supporting proof is carried by the interface rather than by copy, with live parcel coverage, county count, and median run time surfaced as running system state beneath the search field.',
+            image: '/project/primer1.webp',
+            techStack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Vercel'],
+            tools: ['Figma', 'Cursor', 'Claude Code'],
+            status: 'ongoing',
+            startDate: '2026-01-01',
+            role: 'Product & Design Lead',
+            customTimeline: '2026 — Present',
+            team: 'Founder',
+            category: 'AI & Automation',
+            demoUrl: 'https://primer.city',
+            highlights: [
+                'Live address search in the hero, not a signup gate',
+                'Coverage and run-time surfaced as live system state',
+                'Worked example results carried as one-tap entry points',
+            ],
+            features: [
+                {
+                    title: 'Product-First Hero',
+                    items: [
+                        'Put the working address search in the hero so the first interaction is the product, not a form.',
+                        'Anchored the headline on the promise the product is measured against — **a feasibility answer in under a minute**.',
+                        'Framed pre-filled example properties as real results, each carrying its unit count and uIRR, so the value is legible before a visitor types anything.',
+                    ],
+                },
+                {
+                    title: 'Proof Through Interface',
+                    items: [
+                        'Surfaced live parcel coverage, county count, and median run time under the search field as running system state.',
+                        'Let product surfaces — property detail, parcel map, saved sets — do the explaining in place of feature copy.',
+                    ],
+                },
+            ],
+        },
+        {
             id: 'conduit-routing-engine',
             slug: 'conduit-routing-automation',
             title: 'Conduit Routing Automation Engine',
