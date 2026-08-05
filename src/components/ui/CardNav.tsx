@@ -61,7 +61,7 @@ function GrowFadeGrid({ theme = 'dark' }: { theme?: string }) {
                 className="absolute inset-0 opacity-0 group-hover:opacity-[0.12] transition-opacity duration-500"
                 style={{
                     backgroundImage:
-                        'linear-gradient(to right, #D1FF4D 1px, transparent 1px), linear-gradient(to bottom, #D1FF4D 1px, transparent 1px)',
+                        'linear-gradient(to right, var(--brand) 1px, transparent 1px), linear-gradient(to bottom, var(--brand) 1px, transparent 1px)',
                     backgroundSize: `${gridSize}px ${gridSize}px`,
                 }}
             />
@@ -75,8 +75,8 @@ function GrowFadeGrid({ theme = 'dark' }: { theme?: string }) {
                         className={cn(
                             "absolute transition-colors duration-500",
                             isDark
-                                ? "bg-white/12 group-hover:bg-[#D1FF4D]/25"
-                                : "bg-black/8 group-hover:bg-[#D1FF4D]/22"
+                                ? "bg-white/12 group-hover:bg-brand/25"
+                                : "bg-black/8 group-hover:bg-brand/22"
                         )}
                         style={{
                             left: col * gridSize,
@@ -105,8 +105,8 @@ function ActiveDot({ theme }: { theme: string }) {
     return (
         <span className="inline-flex ml-2 -translate-y-px align-middle">
             <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-[#D1FF4D]"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D1FF4D] shadow-[0_0_5px_rgba(209,255,77,0.8)]"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-brand"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-brand shadow-[0_0_5px_rgb(var(--brand-rgb)/0.8)]"></span>
             </span>
         </span>
     );
@@ -122,23 +122,23 @@ function MegaBoxBig({ href, icon: Icon, title, desc, theme, pathname }: any) {
                 ? cn(
                     "bg-[#161616]",
                     isActive
-                        ? "border-[#D1FF4D] shadow-[0_0_15px_rgba(209,255,77,0.08)]"
-                        : "border-white/10 hover:border-[#D1FF4D] hover:shadow-[0_0_15px_rgba(209,255,77,0.08)]"
+                        ? "border-brand shadow-[0_0_15px_rgb(var(--brand-rgb)/0.08)]"
+                        : "border-white/10 hover:border-brand hover:shadow-[0_0_15px_rgb(var(--brand-rgb)/0.08)]"
                 )
                 : cn(
                     "bg-black/[0.02] hover:bg-white",
                     isActive
-                        ? "border-[#D1FF4D] shadow-md shadow-[#D1FF4D]/10"
-                        : "border-black/10 hover:border-[#D1FF4D] hover:shadow-md hover:shadow-[#D1FF4D]/10"
+                        ? "border-brand shadow-md shadow-brand/10"
+                        : "border-black/10 hover:border-brand hover:shadow-md hover:shadow-brand/10"
                 )
         )}>
             <GrowFadeGrid theme={theme} />
 
             {/* Text stays black / grey (or white / grey in dark) for legibility */}
             <Icon className={cn(
-                "w-6 h-6 relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:text-[#D1FF4D]",
+                "w-6 h-6 relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:text-brand",
                 theme === 'dark' ? "text-white/70" : "text-black/70",
-                isActive && "text-[#D1FF4D]"
+                isActive && "text-brand"
             )} />
 
             <div className="relative z-10 mt-auto">
@@ -172,14 +172,14 @@ function MegaBoxSmall({ href, icon: Icon, title, desc, theme, pathname, external
                 ? cn(
                     "bg-[#161616]",
                     isActive
-                        ? "border-[#D1FF4D] shadow-[0_0_15px_rgba(209,255,77,0.08)]"
-                        : "border-white/10 hover:border-[#D1FF4D] hover:shadow-[0_0_15px_rgba(209,255,77,0.08)]"
+                        ? "border-brand shadow-[0_0_15px_rgb(var(--brand-rgb)/0.08)]"
+                        : "border-white/10 hover:border-brand hover:shadow-[0_0_15px_rgb(var(--brand-rgb)/0.08)]"
                 )
                 : cn(
                     "bg-black/[0.02] hover:bg-white",
                     isActive
-                        ? "border-[#D1FF4D] shadow-md shadow-[#D1FF4D]/10"
-                        : "border-black/10 hover:border-[#D1FF4D] hover:shadow-md hover:shadow-[#D1FF4D]/10"
+                        ? "border-brand shadow-md shadow-brand/10"
+                        : "border-black/10 hover:border-brand hover:shadow-md hover:shadow-brand/10"
                 )
         )}>
             <div className="absolute inset-0 opacity-60 pointer-events-none">
@@ -201,9 +201,9 @@ function MegaBoxSmall({ href, icon: Icon, title, desc, theme, pathname, external
                 </div>
                 <div className="p-1.5 rounded-xl">
                     <Icon className={cn(
-                        "w-4 h-4 mt-0.5 flex-shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:text-[#D1FF4D]",
+                        "w-4 h-4 mt-0.5 flex-shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:text-brand",
                         theme === 'dark' ? "text-white/45" : "text-black/45",
-                        isActive && "text-[#D1FF4D]"
+                        isActive && "text-brand"
                     )} />
                 </div>
             </div>
@@ -221,14 +221,14 @@ function SidebarLink({ href, icon: Icon, title, desc, theme, pathname, onClick }
             ? cn(
                 "bg-[#161616]",
                 isActive
-                    ? "border-[#D1FF4D] shadow-[0_0_15px_rgba(209,255,77,0.08)]"
-                    : "border-white/10 hover:border-[#D1FF4D] hover:shadow-[0_0_15px_rgba(209,255,77,0.08)]"
+                    ? "border-brand shadow-[0_0_15px_rgb(var(--brand-rgb)/0.08)]"
+                    : "border-white/10 hover:border-brand hover:shadow-[0_0_15px_rgb(var(--brand-rgb)/0.08)]"
             )
             : cn(
                 "bg-black/[0.02] hover:bg-white",
                 isActive
-                    ? "border-[#D1FF4D] shadow-sm shadow-[#D1FF4D]/10"
-                    : "border-black/10 hover:border-[#D1FF4D] hover:shadow-sm hover:shadow-[#D1FF4D]/10"
+                    ? "border-brand shadow-sm shadow-brand/10"
+                    : "border-black/10 hover:border-brand hover:shadow-sm hover:shadow-brand/10"
             )
     );
 
@@ -251,9 +251,9 @@ function SidebarLink({ href, icon: Icon, title, desc, theme, pathname, onClick }
                 )}>{desc}</p>
             </div>
             <Icon className={cn(
-                "w-5 h-5 relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:text-[#D1FF4D]",
+                "w-5 h-5 relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:text-brand",
                 theme === 'dark' ? "text-white/45" : "text-black/45",
-                isActive && "text-[#D1FF4D]"
+                isActive && "text-brand"
             )} />
         </>
     );
@@ -306,8 +306,8 @@ export default function CardNav({
                 className={cn(
                     "relative inline-flex items-center justify-center h-10 px-6 text-sm font-bold transition-colors duration-300 rounded-full group",
                     isActive || isExpanded
-                        ? "bg-muted/60 text-[#D1FF4D] hover:bg-muted/60 hover:text-[#D1FF4D]"
-                        : "text-muted-foreground hover:bg-muted/60 hover:text-[#D1FF4D]"
+                        ? "bg-muted/60 text-brand hover:bg-muted/60 hover:text-brand"
+                        : "text-muted-foreground hover:bg-muted/60 hover:text-brand"
                 )}
             >
                 {isActive && isExpanded && (
@@ -319,7 +319,7 @@ export default function CardNav({
                         <motion.span
                             animate={{ opacity: [1, 0.4, 1], scale: [1, 1.3, 1] }}
                             transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                            className="w-1.5 h-1.5 rounded-full bg-[#D1FF4D] shadow-[0_0_8px_rgba(209,255,77,0.6)]"
+                            className="w-1.5 h-1.5 rounded-full bg-brand shadow-[0_0_8px_rgb(var(--brand-rgb)/0.6)]"
                         />
                     </motion.div>
                 )}

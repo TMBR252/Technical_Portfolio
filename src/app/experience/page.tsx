@@ -140,7 +140,7 @@ function ExperienceTabSlider({ isLowPowerMode }: { isLowPowerMode: boolean }) {
             <div className="mx-auto w-full max-w-5xl px-8 text-center sm:px-12 mb-12">
                 {/* Orb with Hemisphere Background */}
                 <div className="relative h-28 sm:h-36">
-                    <div className="pointer-events-none absolute top-0 left-1/2 hidden md:block h-[400px] w-[400px] -translate-x-1/2 before:absolute before:inset-0 before:-z-10 before:rounded-full before:bg-gradient-to-b before:from-[#D1FF4D]/25 before:via-[#D1FF4D]/5 before:via-25% before:to-transparent before:to-75% sm:h-[560px] sm:w-[560px]">
+                    <div className="pointer-events-none absolute top-0 left-1/2 hidden md:block h-[400px] w-[400px] -translate-x-1/2 before:absolute before:inset-0 before:-z-10 before:rounded-full before:bg-gradient-to-b before:from-brand/25 before:via-brand/5 before:via-25% before:to-transparent before:to-75% sm:h-[560px] sm:w-[560px]">
                         <div className="h-24 [mask-image:_linear-gradient(0deg,transparent,theme(colors.white)_20%,theme(colors.white))] sm:h-32">
                             {tabs.map((tab, index) => (
                                 <Transition
@@ -155,7 +155,7 @@ function ExperienceTabSlider({ isLowPowerMode }: { isLowPowerMode: boolean }) {
                                     leaveFrom="opacity-100 rotate-0"
                                     leaveTo="opacity-0 rotate-[60deg]"
                                 >
-                                    <div className="relative top-8 sm:top-11 w-12 h-12 rounded-full bg-gradient-to-br from-[#D1FF4D] to-[#7BA82E] shadow-lg shadow-[#D1FF4D]/30" />
+                                    <div className="relative top-8 sm:top-11 w-12 h-12 rounded-full bg-gradient-to-br from-brand to-brand-deep shadow-lg shadow-brand/30" />
                                 </Transition>
                             ))}
                         </div>
@@ -190,9 +190,9 @@ function ExperienceTabSlider({ isLowPowerMode }: { isLowPowerMode: boolean }) {
                     {tabs.map((tab, index) => (
                         <MagneticEffect key={index}>
                             <button
-                                className={`group m-1.5 inline-flex justify-center items-center gap-2.5 rounded-full px-5 py-2.5 text-sm whitespace-nowrap shadow-sm transition-all duration-300 ease-out focus-visible:ring focus-visible:ring-[#D1FF4D]/50 focus-visible:outline-none sm:px-6 sm:py-3 sm:text-base hover:-translate-y-1 hover:shadow-lg ${activeTab === index
-                                    ? "bg-[#D1FF4D] text-black shadow-[#D1FF4D]/25"
-                                    : "bg-white dark:bg-neutral-800/80 backdrop-blur-sm text-neutral-700 dark:text-neutral-200 hover:text-[#D1FF4D] hover:bg-neutral-50 dark:hover:bg-neutral-700/80 border border-transparent dark:border-white/5"
+                                className={`group m-1.5 inline-flex justify-center items-center gap-2.5 rounded-full px-5 py-2.5 text-sm whitespace-nowrap shadow-sm transition-all duration-300 ease-out focus-visible:ring focus-visible:ring-brand/50 focus-visible:outline-none sm:px-6 sm:py-3 sm:text-base hover:-translate-y-1 hover:shadow-lg ${activeTab === index
+                                    ? "bg-brand text-black shadow-brand/25"
+                                    : "bg-white dark:bg-neutral-800/80 backdrop-blur-sm text-neutral-700 dark:text-neutral-200 hover:text-brand hover:bg-neutral-50 dark:hover:bg-neutral-700/80 border border-transparent dark:border-white/5"
                                     }`}
                                 onClick={() => {
                                     setActiveTab(index);

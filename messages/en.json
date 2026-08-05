@@ -424,7 +424,7 @@
         "loadStable": "SYSTEM_LOAD: STABLE"
     },
     "projectHeader": {
-        "title": "WORK I'M <span class=\"text-[#D1FF4D]\">PROUD</span> OF",
+        "title": "WORK I'M <span class=\"text-brand\">PROUD</span> OF",
         "subtitle": "Expert-driven automation products taken from 0 to 1 — agentic systems, human-in-the-loop boundaries, and the evaluation work that makes them trustworthy."
     },
     "common": {

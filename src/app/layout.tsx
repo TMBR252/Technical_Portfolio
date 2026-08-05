@@ -3,8 +3,10 @@ import { Inter, JetBrains_Mono, Playfair_Display, Alex_Brush } from 'next/font/g
 import { getMessages, getLocale } from 'next-intl/server';
 import { ThemeProvider, I18nProvider, SmoothScrollProvider } from '@/providers';
 
+/** Design tokens (brand, type, radius) → src/styles/tokens.css — see README */
 import '@/styles/globals.css';
 
+/** Face loaders — stacks composed in tokens.css (--font-sans / mono / display / hand) */
 const inter = Inter({
     subsets: ['latin'],
     variable: '--font-inter',

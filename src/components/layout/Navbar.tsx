@@ -16,12 +16,12 @@ import { portfolioData } from '@/data/portfolio';
 
 /** Soft grey pill + green label on hover / active */
 const navPill =
-    'rounded-full transition-colors duration-300 hover:bg-muted/60 hover:text-[#D1FF4D] active:bg-muted/60 active:text-[#D1FF4D]';
-const navPillActive = 'bg-muted/60 text-[#D1FF4D] hover:bg-muted/60 hover:text-[#D1FF4D]';
+    'rounded-full transition-colors duration-300 hover:bg-muted/60 hover:text-brand active:bg-muted/60 active:text-brand';
+const navPillActive = 'bg-muted/60 text-brand hover:bg-muted/60 hover:text-brand';
 
 /** Material-sized primary row for phone/tablet hamburger */
 const mobileNavRow =
-    'flex w-full min-h-[4.5rem] items-center justify-center rounded-2xl px-5 text-2xl font-black tracking-tight touch-manipulation transition-colors duration-200 hover:bg-[#D1FF4D]/20 hover:text-[#D1FF4D] active:scale-[0.99] active:bg-[#D1FF4D]/25';
+    'flex w-full min-h-[4.5rem] items-center justify-center rounded-2xl px-5 text-2xl font-black tracking-tight touch-manipulation transition-colors duration-200 hover:bg-brand/20 hover:text-brand active:scale-[0.99] active:bg-brand/25';
 
 const OWNER_TIMEZONE = 'America/New_York';
 
@@ -450,8 +450,8 @@ export function Navbar() {
                                             className={cn(
                                                 mobileNavRow,
                                                 isActive
-                                                    ? 'bg-[#D1FF4D]/15 text-[#D1FF4D] hover:bg-[#D1FF4D]/25'
-                                                    : 'bg-muted/30 text-muted-foreground hover:text-[#D1FF4D] active:text-foreground'
+                                                    ? 'bg-brand/15 text-brand hover:bg-brand/25'
+                                                    : 'bg-muted/30 text-muted-foreground hover:text-brand active:text-foreground'
                                             )}
                                         >
                                             {link.label}
@@ -464,10 +464,10 @@ export function Navbar() {
                                         {mobileSecondaryLinks.map((link) => {
                                             const className = cn(
                                                 'inline-flex min-h-12 items-center justify-between gap-2 rounded-2xl bg-muted/30 px-4 text-sm font-bold uppercase tracking-wider text-muted-foreground touch-manipulation transition-colors duration-200',
-                                                'hover:bg-[#D1FF4D]/20 hover:text-[#D1FF4D] active:scale-[0.99] active:bg-[#D1FF4D]/25 active:text-foreground',
+                                                'hover:bg-brand/20 hover:text-brand active:scale-[0.99] active:bg-brand/25 active:text-foreground',
                                                 !link.external &&
                                                     (pathname === link.href || pathname.startsWith(`${link.href}/`)) &&
-                                                    'bg-[#D1FF4D]/15 text-[#D1FF4D] hover:bg-[#D1FF4D]/25'
+                                                    'bg-brand/15 text-brand hover:bg-brand/25'
                                             );
                                             const icon =
                                                 link.icon === 'linkedin' ? (
@@ -520,7 +520,7 @@ export function Navbar() {
                             <div className="flex shrink-0 items-center justify-center gap-3 border-t border-border/40 px-4 pt-4">
                                 {mounted && (
                                     <AnimatedThemeToggler
-                                        className="inline-flex min-h-12 min-w-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-medium touch-manipulation bg-muted/40 hover:bg-muted/60 hover:text-[#D1FF4D] active:bg-muted/60"
+                                        className="inline-flex min-h-12 min-w-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-medium touch-manipulation bg-muted/40 hover:bg-muted/60 hover:text-brand active:bg-muted/60"
                                     />
                                 )}
                             </div>

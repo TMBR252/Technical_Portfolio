@@ -25,11 +25,11 @@ export default function ImpactSection() {
   const latestBlogs = portfolioData.blogs.slice(0, 5);
 
   const styles = [
-    { bg: "bg-[#D1FF4D]", text: "text-[#111111]" },
-    { bg: "bg-cyan-200", text: "text-[#111111]" },
+    { bg: "bg-brand", text: "text-brand-foreground" },
+    { bg: "bg-cyan-200", text: "text-brand-foreground" },
     { bg: "bg-zinc-800 dark:bg-zinc-900", text: "text-white" },
-    { bg: "bg-[#F3E8D6]", text: "text-[#111111]" },
-    { bg: "bg-amber-300", text: "text-[#111111]" },
+    { bg: "bg-[#F3E8D6]", text: "text-brand-foreground" },
+    { bg: "bg-amber-300", text: "text-brand-foreground" },
   ];
 
   const impactCards = latestBlogs.map((blog, idx) => ({
@@ -58,7 +58,7 @@ export default function ImpactSection() {
             </motion.p>
             <motion.h2 style={{ y: yTitle }} className="text-5xl md:text-7xl lg:text-[80px] leading-[1.05] font-black tracking-tighter uppercase mb-8">
               The Engineering <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D1FF4D] via-cyan-300 to-amber-300">Process.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand via-cyan-300 to-amber-300">Process.</span>
             </motion.h2>
             <motion.p style={{ y: yDesc }} className="text-[15px] sm:text-[16px] text-muted-foreground/80 leading-[1.7] max-w-[560px] font-medium">
               Documenting the journey from concept to deployment. Read the latest thoughts on AI, engineering, and digital architecture.

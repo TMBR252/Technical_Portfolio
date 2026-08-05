@@ -16,6 +16,7 @@ const config: Config = {
 		'./src/pages/**/*.{js,ts,jsx,tsx,mdx}',
 		'./src/components/**/*.{js,ts,jsx,tsx,mdx}',
 		'./src/app/**/*.{js,ts,jsx,tsx,mdx}',
+		'./messages/**/*.json',
 	],
 	darkMode: 'class',
 	theme: {
@@ -34,6 +35,12 @@ const config: Config = {
 			colors: {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				/** Site lime accent — change --brand-rgb in globals.css to rebrand everywhere */
+				brand: {
+					DEFAULT: 'rgb(var(--brand-rgb) / <alpha-value>)',
+					foreground: 'rgb(var(--brand-foreground-rgb) / <alpha-value>)',
+					deep: 'rgb(var(--brand-deep-rgb) / <alpha-value>)',
+				},
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
@@ -103,15 +110,28 @@ const config: Config = {
 				}
 			},
 			fontFamily: {
-				sans: [
-					'var(--font-inter)',
-					'system-ui',
-					'sans-serif'
+				sans: ['var(--font-sans)'],
+				mono: ['var(--font-mono)'],
+				display: ['var(--font-display)'],
+				hand: ['var(--font-hand)'],
+			},
+			fontSize: {
+				'display-xl': [
+					'var(--text-display-xl)',
+					{ lineHeight: '0.95', letterSpacing: '-0.03em', fontWeight: '900' },
 				],
-				mono: [
-					'var(--font-jetbrains)',
-					'monospace'
-				]
+				display: [
+					'var(--text-display)',
+					{ lineHeight: '1.05', letterSpacing: '-0.025em', fontWeight: '800' },
+				],
+				title: [
+					'var(--text-title)',
+					{ lineHeight: '1.15', letterSpacing: '-0.02em', fontWeight: '700' },
+				],
+				'body-lg': [
+					'var(--text-body-lg)',
+					{ lineHeight: '1.6', letterSpacing: '0.01em', fontWeight: '300' },
+				],
 			},
 			animation: {
 				'fade-in': 'fadeIn 0.5s ease-out forwards',
@@ -252,12 +272,18 @@ const config: Config = {
 				'glow-sm': '0 0 10px rgba(0, 255, 255, 0.3)',
 				'glow-md': '0 0 20px rgba(0, 255, 255, 0.4)',
 				'glow-lg': '0 0 40px rgba(0, 255, 255, 0.5)',
-				'inner-glow': 'inset 0 0 20px rgba(0, 255, 255, 0.1)'
+				'inner-glow': 'inset 0 0 20px rgba(0, 255, 255, 0.1)',
+				'brand-sm': 'var(--shadow-brand-sm)',
+				'brand-md': 'var(--shadow-brand-md)',
+				'brand-lg': 'var(--shadow-brand-lg)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+				xl: 'var(--radius-xl)',
+				'2xl': 'var(--radius-2xl)',
+				'3xl': 'var(--radius-3xl)',
 			}
 		}
 	},

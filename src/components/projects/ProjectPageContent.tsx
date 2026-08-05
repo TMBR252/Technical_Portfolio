@@ -14,14 +14,14 @@ import { portfolioData } from '@/data/portfolio';
 
 /** Site brand lime — matches Navbar / IdentitySequence accents */
 const brand = {
-    text: 'text-[#D1FF4D]',
-    textMuted: 'text-[#D1FF4D]/80',
-    bgSoft: 'bg-[#D1FF4D]/10',
-    bgDot: 'bg-[#D1FF4D]',
-    borderSoft: 'border-[#D1FF4D]/30',
-    iconBox: 'bg-[#D1FF4D]/10 text-[#D1FF4D]',
-    hoverBorder: 'group-hover:border-[#D1FF4D]',
-    hoverText: 'group-hover:text-[#D1FF4D]',
+    text: 'text-brand',
+    textMuted: 'text-brand/80',
+    bgSoft: 'bg-brand/10',
+    bgDot: 'bg-brand',
+    borderSoft: 'border-brand/30',
+    iconBox: 'bg-brand/10 text-brand',
+    hoverBorder: 'group-hover:border-brand',
+    hoverText: 'group-hover:text-brand',
 } as const;
 
 // --- Animated Terminal Component ---

@@ -199,7 +199,7 @@ function ProjectListItem({
                     <motion.span
                         className={cn(
                             "text-2xl sm:text-4xl md:text-5xl font-black tabular-nums transition-colors duration-500",
-                            isHovered ? "text-[#D1FF4D]" : "text-muted-foreground/20"
+                            isHovered ? "text-brand" : "text-muted-foreground/20"
                         )}
                         animate={{ scale: isHovered ? 1.1 : 1, x: isHovered ? 5 : 0 }}
                         transition={{ duration: 0.3 }}
@@ -217,7 +217,7 @@ function ProjectListItem({
                             >
                                 {project.title}
                             </motion.h3>
-                            <span className="shrink-0 px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-[#D1FF4D]/15 text-[#D1FF4D] border border-[#D1FF4D]/30">
+                            <span className="shrink-0 px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-brand/15 text-brand border border-brand/30">
                                 {isOngoing ? 'ongoing' : 'done'}
                             </span>
                         </div>
@@ -237,7 +237,7 @@ function ProjectListItem({
                     >
                         <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">view</span>
                         <motion.div animate={{ x: isHovered ? 5 : 0 }} transition={{ duration: 0.3 }}>
-                            <ArrowRight className={cn("w-5 h-5 transition-colors", isHovered ? "text-[#D1FF4D]" : "text-muted-foreground")} />
+                            <ArrowRight className={cn("w-5 h-5 transition-colors", isHovered ? "text-brand" : "text-muted-foreground")} />
                         </motion.div>
                     </motion.div>
                     <ArrowUpRight className="w-5 h-5 text-muted-foreground sm:hidden" />
@@ -263,7 +263,7 @@ function ProjectListItem({
                                         transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
                                     >
                                         {[...Array(4)].map((_, i) => (
-                                            <span key={i} className="mx-4 text-sm font-mono tracking-wider text-[#D1FF4D]/60">
+                                            <span key={i} className="mx-4 text-sm font-mono tracking-wider text-brand/60">
                                                 {techText} •
                                             </span>
                                         ))}
@@ -823,7 +823,7 @@ export default function ProjectsPage() {
                             <div className="flex flex-col justify-between gap-3 px-2 md:flex-row md:items-center md:gap-4">
                                 {/* Title & Count */}
                                 <div className="flex items-center gap-3">
-                                    <div className="w-2 h-2 rounded-full bg-[#D1FF4D] animate-pulse" />
+                                    <div className="w-2 h-2 rounded-full bg-brand animate-pulse" />
                                     <h2 className="text-sm font-mono uppercase tracking-[0.2em] text-muted-foreground">
                                         Projects Archive
                                     </h2>

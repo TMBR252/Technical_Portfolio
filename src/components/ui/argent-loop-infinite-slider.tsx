@@ -227,14 +227,14 @@ export function ArgentLoopInfiniteSlider() {
 
         /* Independent GitHub hover */
         .custom-btn-github:hover {
-            background: #c1e44a !important;
+            background: var(--brand) !important;
             color: black !important;
         }
 
         /* Synchronized View More + Arrow hover */
         .group-projects:hover .custom-btn,
         .group-projects:hover .custom-btn-arrow {
-            background: #c1e44a !important;
+            background: var(--brand) !important;
             color: black !important;
         }
 

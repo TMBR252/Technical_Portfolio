@@ -43,7 +43,7 @@ export function HeroVisual({ isExiting = false }: { isExiting?: boolean }) {
   };
 
   const iconAccentClass =
-    "text-[#D1FF4D] fill-none transition-[filter,color] duration-300 group-hover:drop-shadow-[0_0_6px_rgba(209,255,77,0.28)]";
+    "text-brand fill-none transition-[filter,color] duration-300 group-hover:drop-shadow-[0_0_6px_rgb(var(--brand-rgb)/0.28)]";
 
   // Stepped sizes for lg:hidden — allow wrap on phone to avoid clip; nowrap from md+
   // Slight negative tracking for display Inter Black; more open than tracking-tighter
@@ -525,8 +525,8 @@ export function HeroVisual({ isExiting = false }: { isExiting?: boolean }) {
             <div className="flex items-center justify-between md:justify-end gap-4 md:gap-6">
               <div className="flex items-center gap-2.5 shrink-0">
                 <span className="relative flex size-2">
-                  <span className="absolute inline-flex h-full w-full rounded-full bg-[#D1FF4D] opacity-40 motion-safe:animate-ping motion-reduce:animate-none" />
-                  <span className="relative inline-flex size-2 rounded-full bg-[#D1FF4D]" />
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-brand opacity-40 motion-safe:animate-ping motion-reduce:animate-none" />
+                  <span className="relative inline-flex size-2 rounded-full bg-brand" />
                 </span>
                 <span className="text-xs md:text-[10px] font-bold uppercase tracking-[0.22em] sm:tracking-[0.28em] text-muted-foreground">
                   Open to collaboration
@@ -534,11 +534,11 @@ export function HeroVisual({ isExiting = false }: { isExiting?: boolean }) {
               </div>
               <Link href="/resume" className="group flex items-center shrink-0 touch-manipulation">
                 {/* Expanded by default on phone/tablet (no hover); collapse + hover-expand on lg+ */}
-                <div className="relative flex items-center h-12 w-40 sm:w-44 lg:w-12 lg:group-hover:w-44 rounded-full overflow-hidden transition-all duration-500 ease-[0.23,1,0.32,1] motion-reduce:transition-none bg-[#D1FF4D] lg:bg-foreground/10 lg:group-hover:bg-[#D1FF4D]">
-                  <span className="whitespace-nowrap opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 lg:group-hover:delay-150 text-[10px] font-black uppercase tracking-widest text-[#111111] pl-5 sm:pl-6 pr-12">
+                <div className="relative flex items-center h-12 w-40 sm:w-44 lg:w-12 lg:group-hover:w-44 rounded-full overflow-hidden transition-all duration-500 ease-[0.23,1,0.32,1] motion-reduce:transition-none bg-brand lg:bg-foreground/10 lg:group-hover:bg-brand">
+                  <span className="whitespace-nowrap opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 lg:group-hover:delay-150 text-[10px] font-black uppercase tracking-widest text-brand-foreground pl-5 sm:pl-6 pr-12">
                     View Resume
                   </span>
-                  <div className="absolute right-0 flex items-center justify-center size-12 text-[#111111] rotate-45 lg:text-foreground lg:rotate-0 lg:group-hover:text-[#111111] lg:group-hover:rotate-45 transition-all duration-500 motion-reduce:transition-none motion-reduce:lg:group-hover:rotate-0">
+                  <div className="absolute right-0 flex items-center justify-center size-12 text-brand-foreground rotate-45 lg:text-foreground lg:rotate-0 lg:group-hover:text-brand-foreground lg:group-hover:rotate-45 transition-all duration-500 motion-reduce:transition-none motion-reduce:lg:group-hover:rotate-0">
                     <ArrowDownRight className="w-5 h-5" />
                   </div>
                 </div>

@@ -1,10 +1,12 @@
+@import './tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Light Mode - White dominant with black/gray accents */
+    /* Semantic surfaces (light). Brand / type / radius → tokens.css */
     --background: 0 0% 100%;
     --foreground: 0 0% 9%;
     --card: 0 0% 100%;
@@ -29,7 +31,6 @@
     --chart-3: 0 0% 50%;
     --chart-4: 0 0% 65%;
     --chart-5: 0 0% 80%;
-    --radius: 0.5rem;
   }
 
   .dark {
@@ -447,11 +448,11 @@
   }
 
   .font-serif-elegant {
-    font-family: var(--font-playfair), serif;
+    @apply font-display;
   }
 
   .font-signature {
-    font-family: var(--font-signature), cursive;
+    @apply font-hand;
   }
 }
 

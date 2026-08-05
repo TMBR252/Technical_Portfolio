@@ -148,7 +148,7 @@ export function ProjectStats({ isLowPowerMode }: { isLowPowerMode?: boolean }) {
                     </motion.div>
 
                     <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight text-foreground mb-3">
-                        Work I&apos;m <span className="text-[#D1FF4D]">Proud</span> Of
+                        Work I&apos;m <span className="text-brand">Proud</span> Of
                     </h2>
                 </motion.div>
 

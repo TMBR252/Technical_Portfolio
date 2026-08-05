@@ -211,7 +211,7 @@ export default function TeamShowcase({ members = DEFAULT_MEMBERS }: TeamShowcase
 
                         {/* Active Progress Line (Follows Scroll) */}
                         <motion.div 
-                            className="absolute w-[1.5px] bg-[#D1FF4D] shadow-[0_0_10px_rgba(209,255,77,0.5)] pointer-events-none z-10 origin-top" 
+                            className="absolute w-[1.5px] bg-brand shadow-[0_0_10px_rgb(var(--brand-rgb)/0.5)] pointer-events-none z-10 origin-top" 
                             style={{ 
                                 left: '9.25px', 
                                 top: '24px', 
@@ -365,7 +365,7 @@ const MemberRow = memo(({
                                 layout="position"
                                 className={cn(
                                     'w-4 h-3 rounded-[5px] flex-shrink-0 transition-all duration-300 relative z-20',
-                                    isActive ? 'bg-[#D1FF4D] w-5 shadow-[0_0_10px_rgba(209,255,77,0.6)]' : 'bg-foreground/25',
+                                    isActive ? 'bg-brand w-5 shadow-[0_0_10px_rgb(var(--brand-rgb)/0.6)]' : 'bg-foreground/25',
                                 )}
                             />
                         </div>

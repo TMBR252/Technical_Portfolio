@@ -49,12 +49,12 @@ function DegreeCard({
             whileInView={isLowPowerMode ? {} : { opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: index * 0.2 }}
-            className="col-span-1 border border-black/10 dark:border-white/10 bg-neutral-100 dark:bg-[#0a0a0a] overflow-hidden relative group flex flex-col min-h-[450px] transition-all duration-500 hover:-translate-y-2 hover:border-[#D1FF4D]/50 hover:shadow-[0_20px_40px_-15px_rgba(209,255,77,0.25)]"
+            className="col-span-1 border border-black/10 dark:border-white/10 bg-neutral-100 dark:bg-[#0a0a0a] overflow-hidden relative group flex flex-col min-h-[450px] transition-all duration-500 hover:-translate-y-2 hover:border-brand/50 hover:shadow-[0_20px_40px_-15px_rgb(var(--brand-rgb)/0.25)]"
         >
-            <CornerAccents hoverClass="group-hover:border-[#D1FF4D]" />
+            <CornerAccents hoverClass="group-hover:border-brand" />
 
             <div className="p-8 relative z-10 transition-transform duration-500 group-hover:translate-x-1">
-                <span className="block text-xs font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400 group-hover:text-[#D1FF4D] transition-colors">
+                <span className="block text-xs font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400 group-hover:text-brand transition-colors">
                     {edu.degree}
                     {years && ` • ${years}`}
                 </span>
@@ -64,7 +64,7 @@ function DegreeCard({
             </div>
 
             <div className="flex-1 flex flex-col items-center justify-center relative p-8 mt-auto border-t border-black/10 dark:border-white/10 bg-gradient-to-b from-transparent to-black/5 dark:to-white/5 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-t from-[#D1FF4D]/20 via-black/40 to-black/10 dark:from-[#D1FF4D]/15 dark:via-black/50 dark:to-transparent transition-opacity duration-500 group-hover:opacity-80" />
+                <div className="absolute inset-0 bg-gradient-to-t from-brand/20 via-black/40 to-black/10 dark:from-brand/15 dark:via-black/50 dark:to-transparent transition-opacity duration-500 group-hover:opacity-80" />
 
                 <div className="absolute inset-0 opacity-10 pointer-events-none">
                     <div className={cn('absolute inset-0', GRIDS[index % GRIDS.length])} />
@@ -80,7 +80,7 @@ function DegreeCard({
                         {/* Anchored to the cap, not the card */}
                         {edu.gpa && (
                             <div className="absolute -top-1 -right-7 text-right leading-none md:-right-9">
-                                <span className="block font-mono text-3xl md:text-4xl font-black tabular-nums text-[#D1FF4D] drop-shadow-[0_0_16px_rgba(209,255,77,0.3)]">
+                                <span className="block font-mono text-3xl md:text-4xl font-black tabular-nums text-brand drop-shadow-[0_0_16px_rgb(var(--brand-rgb)/0.3)]">
                                     {edu.gpa}
                                 </span>
                                 <span className="mt-1.5 block font-mono text-[9px] uppercase tracking-[0.3em] text-white/70">
@@ -95,7 +95,7 @@ function DegreeCard({
                             {edu.achievements.map((item) => (
                                 <span
                                     key={item}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] bg-black/40 dark:bg-white/10 text-white border border-white/20 font-mono font-bold backdrop-blur-md shadow-lg group-hover:border-[#D1FF4D]/60 group-hover:text-[#D1FF4D] transition-colors"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] bg-black/40 dark:bg-white/10 text-white border border-white/20 font-mono font-bold backdrop-blur-md shadow-lg group-hover:border-brand/60 group-hover:text-brand transition-colors"
                                 >
                                     <Award className="w-3 h-3" />
                                     {item}
@@ -104,7 +104,7 @@ function DegreeCard({
                         </div>
                     )}
 
-                    <p className="text-[10px] font-mono text-white/90 uppercase tracking-widest bg-black/50 px-2 py-1 rounded backdrop-blur-sm border border-white/10 group-hover:border-[#D1FF4D]/50 transition-colors">
+                    <p className="text-[10px] font-mono text-white/90 uppercase tracking-widest bg-black/50 px-2 py-1 rounded backdrop-blur-sm border border-white/10 group-hover:border-brand/50 transition-colors">
                         {edu.major}
                     </p>
                 </div>
@@ -117,7 +117,7 @@ function DegreeCard({
                 {!isLowPowerMode && (
                     <motion.div
                         aria-hidden
-                        className="pointer-events-none absolute inset-x-0 top-0 z-20 h-24 bg-[linear-gradient(to_bottom,transparent,rgba(209,255,77,0.10),transparent)]"
+                        className="pointer-events-none absolute inset-x-0 top-0 z-20 h-24 bg-[linear-gradient(to_bottom,transparent,rgb(var(--brand-rgb)/0.10),transparent)]"
                         initial={{ y: '-100%', opacity: 0 }}
                         animate={{ y: ['-100%', '420%'], opacity: [0, 1, 1, 0] }}
                         transition={{
@@ -158,14 +158,14 @@ export function EducationSection({ isLowPowerMode }: { isLowPowerMode?: boolean 
                     whileInView={isLowPowerMode ? {} : { opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: education.length * 0.2 }}
-                    className="col-span-1 md:col-span-2 border border-black/10 dark:border-white/10 bg-neutral-100 dark:bg-[#0a0a0a] overflow-hidden relative group p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 transition-all duration-500 hover:border-[#D1FF4D]/50 hover:shadow-[inset_0_0_30px_rgba(209,255,77,0.08),0_0_30px_-5px_rgba(209,255,77,0.25)] hover:bg-neutral-50 dark:hover:bg-[#0f0f0f]"
+                    className="col-span-1 md:col-span-2 border border-black/10 dark:border-white/10 bg-neutral-100 dark:bg-[#0a0a0a] overflow-hidden relative group p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 transition-all duration-500 hover:border-brand/50 hover:shadow-[inset_0_0_30px_rgb(var(--brand-rgb)/0.08),0_0_30px_-5px_rgb(var(--brand-rgb)/0.25)] hover:bg-neutral-50 dark:hover:bg-[#0f0f0f]"
                 >
-                    <CornerAccents hoverClass="group-hover:border-[#D1FF4D]" />
-                    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#D1FF4D]/25 via-transparent to-transparent group-hover:opacity-40 transition-opacity duration-700" />
+                    <CornerAccents hoverClass="group-hover:border-brand" />
+                    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-brand/25 via-transparent to-transparent group-hover:opacity-40 transition-opacity duration-700" />
 
                     <div className="relative z-10 space-y-3 max-w-2xl">
                         <div className="flex items-center gap-2">
-                            <Binary className="w-4 h-4 text-[#D1FF4D]" />
+                            <Binary className="w-4 h-4 text-brand" />
                             <span className="text-xs font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400">
                                 Applied Since
                             </span>
