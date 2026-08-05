@@ -24,6 +24,8 @@ export interface Project {
     team?: string;
     customTimeline?: string;
     role?: string;
+    /** Short blurb under the role title on the project page */
+    roleDescription?: string;
 }
 
 export interface Experience {

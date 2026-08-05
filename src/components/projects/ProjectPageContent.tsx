@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useRef, type MouseEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { X, Code, Box, ExternalLink, Github, Terminal, ChevronRight, ChevronLeft, Copy, Check, Zap, Sparkles, ArrowLeft, Clock, Users, Layers, LayoutGrid } from 'lucide-react';
+import { X, Box, ExternalLink, Github, Terminal, ChevronRight, ChevronLeft, Copy, Check, Zap, Sparkles, ArrowLeft, LayoutGrid } from 'lucide-react';
 import { cn, formatDate } from '@/lib/utils';
 import { Project } from '@/types';
 import { ProjectPlaceholder } from './ProjectPlaceholder';
@@ -298,6 +298,8 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
     const router = useRouter();
     const isOngoing = project.status === 'ongoing';
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+    const [activeTocId, setActiveTocId] = useState('mission');
+    const [hoveredTocId, setHoveredTocId] = useState<string | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     /** Hero first, then gallery shots (deduped) — one slideshow for the page */
@@ -309,9 +311,53 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
         return gallery.length > 0 ? gallery : project.image ? [project.image] : [];
     }, [project.image, project.galleryImages]);
 
+    const tocItems = useMemo(() => {
+        const items: { id: string; label: string }[] = [
+            { id: 'mission', label: t('sections.missionBrief') },
+        ];
+        if (project.features) items.push({ id: 'features', label: t('sections.keyFeatures') });
+        if (project.challengesAndSolutions) items.push({ id: 'chronicles', label: t('sections.engineeringChronicles') });
+        if (project.galleryImages?.length) items.push({ id: 'gallery', label: t('sections.visualGallery') });
+        if (project.installation) items.push({ id: 'installation', label: t('sections.installation') });
+        return items;
+    }, [project.features, project.challengesAndSolutions, project.galleryImages, project.installation, t]);
+
+    const highlightedTocId = hoveredTocId ?? activeTocId;
+
+    useEffect(() => {
+        const ids = tocItems.map((item) => item.id);
+        const elements = ids
+            .map((id) => document.getElementById(id))
+            .filter((el): el is HTMLElement => Boolean(el));
+        if (elements.length === 0) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const visible = entries
+                    .filter((entry) => entry.isIntersecting)
+                    .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+                if (visible[0]?.target.id) {
+                    setActiveTocId(visible[0].target.id);
+                }
+            },
+            {
+                rootMargin: '-20% 0px -55% 0px',
+                threshold: [0, 0.1, 0.25, 0.5, 0.75],
+            }
+        );
+
+        elements.forEach((el) => observer.observe(el));
+        return () => observer.disconnect();
+    }, [tocItems]);
+
     const openSlideshow = (index: number) => {
         if (slideshowImages.length === 0) return;
         setLightboxIndex(Math.max(0, Math.min(index, slideshowImages.length - 1)));
+    };
+
+    const scrollToSection = (id: string) => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setActiveTocId(id);
     };
 
     const handleExit = () => {
@@ -405,35 +451,46 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                 </motion.div>
             </div>
 
-            {/* 3. METADATA BAR (Horizontal Strip) */}
+            {/* 3. ROLE / TIMELINE / TECH */}
             <div className={cn(
                 'container max-w-7xl mx-auto px-6',
                 project.highlights && project.highlights.length > 0 ? 'mb-8' : 'mb-20'
             )}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-4 border-y border-black/20 dark:border-border/40 py-8">
-                    <div className="flex flex-col gap-2">
-                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold flex items-center gap-2">
-                            <Code className="w-3 h-3" /> {t('metadata.role')}
-                        </span>
-                        <span className="font-bold text-foreground">{project.role || t('metadata.roleValue')}</span>
+                <div className="border-y border-black/20 dark:border-border/40 py-10 space-y-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
+                        <div className="flex flex-col gap-2 max-w-xl">
+                            <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+                                {t('metadata.role')}
+                            </span>
+                            <span className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+                                {project.role || t('metadata.roleValue')}
+                            </span>
+                            {project.roleDescription && (
+                                <p className="text-sm md:text-base text-muted-foreground leading-relaxed mt-1">
+                                    {project.roleDescription}
+                                </p>
+                            )}
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+                                {t('metadata.timeline')}
+                            </span>
+                            <span className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+                                {project.customTimeline || formatDate(project.startDate)}
+                            </span>
+                        </div>
                     </div>
-                    <div className="flex flex-col gap-2">
-                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold flex items-center gap-2">
-                            <Clock className="w-3 h-3" /> {t('metadata.timeline')}
+
+                    <div className="flex flex-col gap-3">
+                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+                            {t('metadata.techStack')}
                         </span>
-                        <span className="font-bold text-foreground">{project.customTimeline || formatDate(project.startDate)}</span>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold flex items-center gap-2">
-                            <Users className="w-3 h-3" /> {t('metadata.team')}
-                        </span>
-                        <span className="font-bold text-foreground">{project.team || t('metadata.teamValue')}</span>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold flex items-center gap-2">
-                            <Layers className="w-3 h-3" /> {t('metadata.techStack')}
-                        </span>
-                        <span className="font-bold text-foreground truncate">{t('metadata.techStackValue', { count: project.techStack.length })}</span>
+                        <p className={cn(
+                            'text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight leading-[1.25]',
+                            brand.text
+                        )}>
+                            {project.techStack.join(', ')}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -647,17 +704,36 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                                 </div>
                             </div>
 
-                            {/* Table of Contents (Functional) */}
-                            <div>
+                            {/* Table of Contents — scrollspy + hover highlight */}
+                            <nav aria-label={t('sections.contents')}>
                                 <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-6 pb-4 border-b border-black/25 dark:border-white/5">{t('sections.contents')}</h3>
-                                <ul className="space-y-3 text-sm text-muted-foreground">
-                                    <li onClick={() => document.getElementById('mission')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground cursor-pointer transition-colors hover:translate-x-1 duration-200 block">• {t('sections.missionBrief')}</li>
-                                    {project.features && <li onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground cursor-pointer transition-colors hover:translate-x-1 duration-200 block">• {t('sections.keyFeatures')}</li>}
-                                    {project.challengesAndSolutions && <li onClick={() => document.getElementById('chronicles')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground cursor-pointer transition-colors hover:translate-x-1 duration-200 block">• {t('sections.engineeringChronicles')}</li>}
-                                    {project.galleryImages && <li onClick={() => document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground cursor-pointer transition-colors hover:translate-x-1 duration-200 block">• {t('sections.visualGallery')}</li>}
-                                    {project.installation && <li onClick={() => document.getElementById('installation')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground cursor-pointer transition-colors hover:translate-x-1 duration-200 block">• {t('sections.installation')}</li>}
+                                <ul className="flex flex-col gap-1">
+                                    {tocItems.map((item) => {
+                                        const isActive = highlightedTocId === item.id;
+                                        return (
+                                            <li key={item.id}>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => scrollToSection(item.id)}
+                                                    onMouseEnter={() => setHoveredTocId(item.id)}
+                                                    onMouseLeave={() => setHoveredTocId(null)}
+                                                    onFocus={() => setHoveredTocId(item.id)}
+                                                    onBlur={() => setHoveredTocId(null)}
+                                                    className={cn(
+                                                        'w-full text-left py-1.5 transition-all duration-200 origin-left',
+                                                        isActive
+                                                            ? cn(brand.text, 'text-lg font-bold tracking-tight scale-[1.02]')
+                                                            : 'text-sm font-medium text-muted-foreground'
+                                                    )}
+                                                    aria-current={activeTocId === item.id ? 'true' : undefined}
+                                                >
+                                                    {item.label}
+                                                </button>
+                                            </li>
+                                        );
+                                    })}
                                 </ul>
-                            </div>
+                            </nav>
 
                         </div>
                     </div>
