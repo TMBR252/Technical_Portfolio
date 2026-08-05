@@ -46,7 +46,7 @@ export const portfolioData: PortfolioData = {
                 'I designed and built the Primer marketing site from 0→1 — a product-first surface where the first interaction is the feasibility search itself.',
             longDescription:
                 'Primer answers whether a real-estate project is feasible from an address in under a minute. A brochure site would undersell that — visitors need to feel the product before they sign up. I designed and implemented primer.city end to end: the visual system and the Vite/React marketing OS across home, pricing, use cases, insights, contact, access, and legal, so the first interaction matches the product itself — type a property address, get a feasibility read back.',
-            techStack: ['Vite', 'React', 'React Router', 'Mapbox GL', 'CSS Design Tokens', 'Vercel'],
+            techStack: ['Vite', 'React 18', 'React Router 6', 'CSS Design Tokens', 'Vercel Serverless'],
             tools: ['Figma', 'Cursor', 'Claude Code'],
             status: 'ongoing',
             startDate: '2026-01-01',
@@ -55,68 +55,150 @@ export const portfolioData: PortfolioData = {
             team: 'Founder',
             category: 'Design Engineering',
             demoUrl: 'https://primer.city',
+            premise:
+                'Primer sells one thing: a feasibility answer in under a minute. No amount of marketing copy can make a speed claim credible to people who have been promised speed before — so the site had to let them check it in the first viewport.',
+            metrics: [
+                { value: '58s', label: 'median report run time, stated in the hero' },
+                { value: '3,142', label: 'counties of live parcel coverage' },
+                { value: '9', label: 'routes designed, built, and shipped' },
+                { value: '1', label: 'person, Figma through Vercel' },
+            ],
+            image: '/project/primer1.webp',
+            imageCaption:
+                'primer.city on load. The dashboard band is cropped by the fold on purpose — enough of the product to promise more, without spending a scroll on it.',
+            figures: [
+                {
+                    src: '/project/primer7.webp',
+                    label: 'Home · first viewport',
+                    caption:
+                        'The claim and the means of testing it sit in the same glance — headline, working address input, and three real example properties with their unit counts and yields.',
+                },
+                {
+                    src: '/project/primer2.webp',
+                    label: 'Home · product band and workflow',
+                    caption:
+                        'Real captures of property detail, parcel geometry, and the assistant, followed by the three-step workflow. Product presence without loading the platform.',
+                },
+                {
+                    src: '/project/primer5.webp',
+                    label: 'Pricing',
+                    caption:
+                        'Plans read from a content collection, not from markup — a price change is a data edit. The dark band inverts the home stage while keeping the same type and spacing scale.',
+                },
+                {
+                    src: '/project/primer4.webp',
+                    label: 'Use case · developers',
+                    caption:
+                        'Each persona route argues one job with its own numbers. Same chrome, same grid, different evidence — added in week eight, indistinguishable from the original set.',
+                },
+                {
+                    src: '/project/primer6.webp',
+                    label: 'Access gate',
+                    caption:
+                        'Every login and trial CTA lands here. The gate is deliberately plain: it is a door, not a pitch, and the pitch already happened.',
+                },
+                {
+                    src: '/project/primer8.webp',
+                    label: 'Contact',
+                    caption:
+                        'The one place the site spends a heavy dependency, loaded on demand so no other route pays for it.',
+                },
+            ],
+            narrative: [
+                {
+                    eyebrow: 'The problem',
+                    heading: 'A brochure cannot sell a stopwatch.',
+                    body: [
+                        'Primer answers whether a real-estate project is feasible from nothing but an address, and it does it in about a minute. That is the entire product claim, and it is a claim about time.',
+                        'The conventional marketing move for this category — hero illustration, feature grid, book-a-demo — asks the visitor to take the speed on faith. The visitors are developers, land teams, and underwriters. Software has promised them speed before. Faith was not available.',
+                        'So the site had a job the copy could not do: make the claim checkable before anyone signs up, on the first screen, without the platform.',
+                    ],
+                    figures: [0],
+                },
+                {
+                    eyebrow: 'The bet',
+                    heading: 'Make the first interaction the product, not the signup.',
+                    body: [
+                        'The hero is a working address search rather than a picture of one. The headline states the measurable promise. Directly under the input runs the system state — live parcel data, 3,142 counties, avg 58s — and three real properties with their unit counts and yields.',
+                        'A visitor reads the claim and sees the machinery behind it in one glance, then either types an address or scrolls into captures of the actual product. Nothing between them and the evidence.',
+                    ],
+                    aside: 'The search had to be built to product quality before a single visitor saw it. That is the cost of leading with it.',
+                    figures: [1],
+                },
+                {
+                    eyebrow: 'The system',
+                    heading: 'Nine routes that read as one product.',
+                    body: [
+                        'The codebase is a strict hierarchy — Page → Section → Area → Frame → Component. Layout and breakpoints live in frames, copy lives in content collections behind accessors, and colour, type, and space come from shared tokens. Sections stay presentational.',
+                        'That structure is what let home, pricing, use cases, insights, posts, contact, terms, privacy, and the access gate stay in one visual family while the surface roughly doubled. A page added late lands in a predictable place and inherits the system instead of re-inventing it.',
+                    ],
+                    figures: [2, 3],
+                },
+                {
+                    eyebrow: 'Constraints',
+                    heading: 'What the site is not allowed to do.',
+                    body: [
+                        'Three rules held the whole build. No invented numbers: every public figure is a verified product fact or an explicitly labelled market estimate. No exposed platform: the product was in early access, so every CTA routes through a passcode gate backed by a serverless check. No embedded app: the marketing bundle never loads the SPA, because a slow page selling speed argues against itself.',
+                        'Each rule cost something real, and each was cheaper than the alternative.',
+                    ],
+                    figures: [4, 5],
+                },
+            ],
+            designDecisions: [
+                {
+                    decision: 'Lead with a live search field instead of a hero image.',
+                    rationale:
+                        'The product claim is time-to-answer. A visitor who types an address has tested that claim before reading a word of copy.',
+                    tradeoff:
+                        'A heavier first viewport, and an input that has to feel instant while running on a marketing bundle.',
+                    rejected: 'A static hero illustration with a Book a demo button — the category default.',
+                },
+                {
+                    decision: 'Put proof in the interface as running system state, not in a feature list.',
+                    rationale:
+                        'Coverage, county count, and median run time set in mono under the input read as instrumentation. Instrumentation is more believable than a bullet.',
+                    tradeoff:
+                        'Those figures now have to stay true. Proof in the UI is a standing maintenance obligation on a marketing site.',
+                    rejected: 'A logo trust bar and rounded-up stat tiles.',
+                },
+                {
+                    decision: 'Show the product through real UI captures rather than an embedded app.',
+                    rationale:
+                        'Visitors need product presence within two scrolls, and loading the real platform into the marketing bundle would cost the page the speed it is selling.',
+                    tradeoff:
+                        'Captures go stale. They need a refresh discipline tied to product releases, and nobody else will notice when it slips.',
+                    rejected: 'An iframe of the live app, or a recorded demo video above the fold.',
+                },
+                {
+                    decision: 'Every public number is a verified product fact or a labelled market estimate.',
+                    rationale:
+                        'The audience underwrites for a living. One figure they can disprove costs the credibility of every other figure on the page.',
+                    tradeoff:
+                        'The headline claims read smaller than competitors who round up. That is the trade, taken deliberately.',
+                    rejected: 'Directional marketing numbers with an asterisk.',
+                },
+                {
+                    decision: 'Route every login and trial CTA through a passcode gate.',
+                    rationale:
+                        'The marketing surface needed to be fully public while the platform was still early access. The gate keeps those two facts from colliding.',
+                    tradeoff:
+                        'A step between intent and product, paid on purpose to keep an unfinished platform out of public view.',
+                    rejected:
+                        'Hiding the CTAs until launch, which would leave the site with nothing to convert on.',
+                },
+                {
+                    decision: 'Keep copy in content collections and sections presentational.',
+                    rationale:
+                        'Nine routes, no CMS. Pricing, use cases, posts, and legal all read through accessors, so changing a price or a plan is a data edit rather than a component edit.',
+                    tradeoff: 'Copy changes ship through a deploy instead of an editor.',
+                    rejected: 'A hosted CMS — more infrastructure than a one-person marketing site earns.',
+                },
+            ],
             highlights: [
                 'Designed and engineered end to end',
                 'Live at primer.city',
                 'Multi-page marketing system',
                 'Passcode-gated platform entry',
-            ],
-            features: [
-                {
-                    title: 'Product-First Hero',
-                    items: [
-                        'Put the working address search, promise headline, and example result chips in the first viewport so the first interaction is the product, not a signup form.',
-                        'Locked the headline to the measurable promise — **a feasibility answer in under a minute** — instead of generic marketing copy.',
-                        'Implemented it as a composed **HeroSection** with search/copy areas — a live UI composition, not a static marketing image.',
-                    ],
-                },
-                {
-                    title: 'Proof in the Interface',
-                    items: [
-                        'Surfaced live parcel coverage, county count, and median run time under the search as running system state so proof sits in the UI, not in a feature list.',
-                        'Showed product surfaces — property detail, parcel map, saved sets — without forcing signup.',
-                        'Built a dashboard mock band and sticky **product-flow** sections wired with real UI captures so visitors see the product without loading the app.',
-                    ],
-                },
-                {
-                    title: 'Visual System That Scales',
-                    items: [
-                        'Defined a light grain stage, floating **pill nav**, Primer mark, and motion that adds presence without stealing the search CTA.',
-                        'Kept pricing, use cases, insights, and legal in one visual family so the marketing surface reads as one product.',
-                        'Implemented shared **design tokens** and chrome (`library/tokens`, Nav, Footer, InteractiveDotField) reused by every route.',
-                    ],
-                },
-                {
-                    title: 'Marketing-Site Architecture',
-                    items: [
-                        'Gave each page a single job — convert, explain, gate, or legal — so IA stayed scannable as the surface grew.',
-                        'Structured the codebase as **Page → Section → Area → Frame → Component** so new bands land in a predictable tree.',
-                        'Shipped content collections/accessors, React Router routes, and Vercel **api/** endpoints for contact, public config, and the passcode access gate.',
-                    ],
-                },
-            ],
-            challengesAndSolutions: [
-                {
-                    problem:
-                        'The site had to feel like the product without shipping the full app in the marketing bundle.',
-                    solution:
-                        'Designed a dashboard mock and sticky product-flow band, then composed them in the page tree with real UI assets — product presence without embedding the SPA.',
-                },
-                {
-                    problem: 'Multi-page marketing without a CMS still needed consistent, editable copy.',
-                    solution:
-                        'Kept sections presentational and moved copy into content collections with accessors for pricing, use cases, posts, and legal — editable data, dumb UI.',
-                },
-                {
-                    problem: 'Early access required without exposing the live platform on public CTAs.',
-                    solution:
-                        'Routed login and free-trial CTAs to `/access` and backed the passcode check with a serverless gate so marketing stays public and the product stays private.',
-                },
-                {
-                    problem: 'Every public statistic had to be real — no invented marketing numbers.',
-                    solution:
-                        'Constrained design and use-case content to verified product facts in the content data (avg 58s, 3,142 counties) and labelled market figures explicitly.',
-                },
             ],
         },
         {

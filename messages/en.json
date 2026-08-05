@@ -200,7 +200,7 @@
         },
         "sections": {
             "missionBrief": "Context",
-            "keyFeatures": "Decisions",
+            "keyFeatures": "What shipped",
             "engineeringChronicles": "Constraints",
             "visualGallery": "Visual Gallery",
             "installation": "Installation Instructions",
@@ -213,7 +213,16 @@
             "viewLess": "Show Less",
             "solution": "Solution",
             "liveDemo": "Live Demo",
-            "sourceCode": "Source Code"
+            "sourceCode": "Source Code",
+            "designDecisions": "Design Decisions",
+            "designDecisionsHeading": "What was decided, and what it cost.",
+            "keyFeaturesHeading": "The pieces that make it work.",
+            "constraintsHeading": "What made it hard.",
+            "visualGalleryHeading": "The surface.",
+            "rationale": "Why",
+            "tradeoff": "Cost",
+            "rejected": "Instead of",
+            "colophon": "Colophon"
         },
         "status": {
             "ongoing": "Active Development",

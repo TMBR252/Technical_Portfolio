@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { X, Code, Box, ExternalLink, Github, Terminal, ChevronRight, ChevronLeft, Copy, Check, Zap, Sparkles, ArrowLeft, Clock, Users, Layers, LayoutGrid } from 'lucide-react';
+import { X, ArrowLeft, ArrowUpRight, ChevronRight, ChevronLeft, Copy, Check, Github } from 'lucide-react';
 import { cn, formatDate } from '@/lib/utils';
 import { Project } from '@/types';
 import { ProjectPlaceholder } from './ProjectPlaceholder';
@@ -12,7 +12,123 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { portfolioData } from '@/data/portfolio';
 
-// --- Animated Terminal Component ---
+/** Shared measures. The masthead, every chapter, and the colophon sit on this one edge. */
+const SHELL = 'mx-auto w-full max-w-6xl px-6';
+const PROSE = 'max-w-[62ch]';
+const RULE = 'border-black/10 dark:border-white/10';
+const EYEBROW = 'font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground';
+
+const two = (n: number) => String(n).padStart(2, '0');
+
+/** Renders **bold** markers as weight, not as a coloured chip. */
+const renderRichText = (text: string) => {
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+    return parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+            return (
+                <strong key={i} className="font-semibold text-foreground">
+                    {part.slice(2, -2)}
+                </strong>
+            );
+        }
+        return <span key={i}>{part}</span>;
+    });
+};
+
+/** Opacity + short lift on scroll-in. Collapses to a plain div when motion is reduced. */
+const Reveal = ({
+    children,
+    delay = 0,
+    className,
+}: {
+    children: React.ReactNode;
+    delay?: number;
+    className?: string;
+}) => {
+    const reduced = useReducedMotion();
+    if (reduced) return <div className={className}>{children}</div>;
+    return (
+        <motion.div
+            className={className}
+            initial={{ opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-8%' }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay }}
+        >
+            {children}
+        </motion.div>
+    );
+};
+
+/** A captioned image. The caption carries the argument; the image is the evidence. */
+const Figure = ({
+    src,
+    label,
+    caption,
+    chrome = true,
+    mockupUrl,
+    onOpen,
+}: {
+    src: string;
+    label?: string;
+    caption?: string;
+    chrome?: boolean;
+    mockupUrl?: string;
+    onOpen: () => void;
+}) => (
+    <Reveal className="mt-12">
+        <figure className="space-y-4">
+            {chrome ? (
+                <BrowserMockup url={mockupUrl} onClick={onOpen}>
+                    <img src={src} alt={label || caption || ''} loading="lazy" className="block h-auto w-full object-cover object-top" />
+                </BrowserMockup>
+            ) : (
+                <button
+                    type="button"
+                    onClick={onOpen}
+                    className={cn('block w-full cursor-zoom-in overflow-hidden rounded-2xl border', RULE)}
+                >
+                    <img src={src} alt={label || caption || ''} loading="lazy" className="block h-auto w-full" />
+                </button>
+            )}
+            {(label || caption) && (
+                <figcaption className={cn('flex flex-col gap-2 border-l pl-4 sm:flex-row sm:gap-6 sm:pl-6', RULE)}>
+                    {label && <span className={cn(EYEBROW, 'shrink-0 pt-0.5 sm:w-44')}>{label}</span>}
+                    {caption && (
+                        <span className="max-w-[58ch] text-sm leading-relaxed text-muted-foreground">{caption}</span>
+                    )}
+                </figcaption>
+            )}
+        </figure>
+    </Reveal>
+);
+
+/**
+ * Numbered chapter heading — the spine of the scroll.
+ * `sticky` parks it beside its own prose in the narrow-column beats;
+ * full-width evidence sections (decisions, galleries) leave it inline.
+ */
+const ChapterHeading = ({
+    index,
+    eyebrow,
+    heading,
+    sticky,
+}: {
+    index: number;
+    eyebrow: string;
+    heading: string;
+    sticky?: boolean;
+}) => (
+    <Reveal className={cn(sticky && 'lg:sticky lg:top-24 lg:self-start')}>
+        <span className={EYEBROW}>
+            {two(index)} — {eyebrow}
+        </span>
+        <h2 className="mt-5 max-w-[24ch] text-balance text-3xl font-semibold leading-[1.1] tracking-[-0.02em] text-foreground md:text-4xl">
+            {heading}
+        </h2>
+    </Reveal>
+);
+
 const TerminalBlock = ({ title, code }: { title: string; code: string }) => {
     const [copied, setCopied] = useState(false);
 
@@ -23,153 +139,52 @@ const TerminalBlock = ({ title, code }: { title: string; code: string }) => {
     };
 
     return (
-        <div className="rounded-xl overflow-hidden border border-black/15 dark:border-white/10 bg-slate-50 dark:bg-zinc-950 shadow-2xl">
-            {/* Terminal Header */}
-            <div className="flex items-center justify-between px-4 py-2 bg-slate-200/50 dark:bg-white/5 border-b border-black/10 dark:border-white/5">
-                <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                    <div className="w-3 h-3 rounded-full bg-green-500/80" />
-                </div>
-                <span className="text-xs font-mono text-slate-500 dark:text-white/30">{title}</span>
-                <div className="w-10" /> {/* Spacer for balance */}
+        <div className={cn('overflow-hidden rounded-xl border bg-secondary/20 dark:bg-white/[0.02]', RULE)}>
+            <div className={cn('flex items-center justify-between border-b px-4 py-2.5', RULE)}>
+                <span className={EYEBROW}>{title}</span>
+                <button
+                    onClick={handleCopy}
+                    className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                    aria-label="Copy"
+                >
+                    {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                </button>
             </div>
-
-            {/* Terminal Body */}
-            <div className="relative group p-4">
-                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                        onClick={handleCopy}
-                        className="p-1.5 rounded-md bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-slate-500 dark:text-white/50 hover:text-black dark:hover:text-white transition-all focus:outline-none"
-                    >
-                        {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                    </button>
-                </div>
-                <div className="font-mono text-sm leading-relaxed overflow-x-auto">
-                    {code.split('\n').map((line, i) => (
-                        <div key={i} className="flex min-w-max">
-                            <span className="text-slate-400 dark:text-white/20 mr-4 select-none">$</span>
-                            <span className="text-emerald-700 dark:text-emerald-400">{line}</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// Helper to render text with bold markers (**text**)
-const renderRichText = (text: string) => {
-    const parts = text.split(/(\*\*.*?\*\*)/g);
-    return parts.map((part, i) => {
-        if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={i} className="font-bold text-foreground bg-primary/10 px-1 rounded mx-0.5">{part.slice(2, -2)}</strong>;
-        }
-        return <span key={i}>{part}</span>;
-    });
-};
-
-// --- Vertical Gallery Component (browser mockup frames) ---
-const ProjectGallery = ({
-    images,
-    onImageClick,
-    viewMoreText,
-    viewLessText,
-    mockupUrl,
-}: {
-    images: string[];
-    onImageClick: (img: string) => void;
-    viewMoreText: string;
-    viewLessText: string;
-    mockupUrl?: string;
-}) => {
-    const [showAll, setShowAll] = useState(false);
-    const visibleImages = showAll ? images : images.slice(0, 2);
-
-    return (
-        <div className="flex flex-col gap-8 pb-12">
-            <div className="flex flex-col gap-10">
-                {visibleImages.map((img, idx) => (
-                    <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: '-10%' }}
-                        transition={{ duration: 0.6, delay: idx * 0.1 }}
-                    >
-                        <BrowserMockup url={mockupUrl} onClick={() => onImageClick(img)}>
-                            <img
-                                src={img}
-                                alt={`Gallery Image ${idx + 1}`}
-                                loading="lazy"
-                                className="block h-auto w-full object-cover object-top"
-                            />
-                        </BrowserMockup>
-                    </motion.div>
+            <div className="overflow-x-auto p-4 font-mono text-sm leading-relaxed text-foreground">
+                {code.split('\n').map((line, i) => (
+                    <div key={i} className="flex min-w-max">
+                        <span className="mr-4 select-none text-muted-foreground/50">$</span>
+                        <span>{line}</span>
+                    </div>
                 ))}
             </div>
-
-            {images.length > 2 && (
-                <div className="flex justify-center pt-4">
-                    <button
-                        onClick={() => setShowAll(!showAll)}
-                        className="px-6 py-3 rounded-full border border-border/40 hover:bg-secondary/10 transition-colors text-sm font-bold tracking-wide uppercase flex items-center gap-2 group"
-                    >
-                        <span>{showAll ? viewLessText : viewMoreText}</span>
-                        <ChevronRight className={cn('w-4 h-4 transition-transform duration-300', showAll ? 'rotate-[-90deg]' : 'rotate-90')} />
-                    </button>
-                </div>
-            )}
         </div>
     );
 };
 
-// --- Typewriter Effect Component ---
-const Typewriter = ({ examples }: { examples: string[] }) => {
-    const [currentText, setCurrentText] = useState("");
-    const [loopNum, setLoopNum] = useState(0);
-    const [isDeleting, setIsDeleting] = useState(false);
-    const typingSpeed = 100;
-    const deletingSpeed = 50;
-    const pauseTime = 2000;
-
-    useEffect(() => {
-        const handleType = () => {
-            const i = loopNum % examples.length;
-            const fullText = examples[i];
-
-            setCurrentText(isDeleting
-                ? fullText.substring(0, currentText.length - 1)
-                : fullText.substring(0, currentText.length + 1)
-            );
-
-            if (!isDeleting && currentText === fullText) {
-                setTimeout(() => setIsDeleting(true), pauseTime);
-            } else if (isDeleting && currentText === "") {
-                setIsDeleting(false);
-                setLoopNum(loopNum + 1);
-            }
-        };
-
-        const timer = setTimeout(handleType, isDeleting ? deletingSpeed : typingSpeed);
-        return () => clearTimeout(timer);
-    }, [currentText, isDeleting, loopNum, examples]);
-
-    return (
-        <span className="font-mono text-emerald-400">
-            {currentText}
-            <span className="animate-pulse">|</span>
-        </span>
-    );
+type Chapter = {
+    id: string;
+    eyebrow: string;
+    heading: string;
+    kind: 'beat' | 'decisions' | 'features' | 'challenges' | 'gallery' | 'install';
+    body?: string[];
+    aside?: string;
+    figures?: number[];
 };
 
-export function ProjectPageContent({ project, isLowPowerMode }: { project: Project; isLowPowerMode?: boolean }) {
+export function ProjectPageContent({ project }: { project: Project; isLowPowerMode?: boolean }) {
     const t = useTranslations('projects');
-    const tCommon = useTranslations('common');
     const router = useRouter();
     const isOngoing = project.status === 'ongoing';
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [activeChapter, setActiveChapter] = useState<string | null>(null);
+    const [showRail, setShowRail] = useState(false);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const mastheadRef = useRef<HTMLElement>(null);
+
+    const mockupUrl = project.demoUrl
+        ? project.demoUrl.replace(/^https?:\/\//, '')
+        : `${project.title.toLowerCase().replace(/\s+/g, '')}.app`;
 
     const handleExit = () => {
         if (typeof window !== 'undefined' && document.referrer.includes('/projects')) {
@@ -179,434 +194,660 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
         }
     };
 
-    // Get other projects for "More Projects" section
+    /** Curated figures win; otherwise fall back to filesystem-discovered gallery images. */
+    const figures = useMemo(() => {
+        if (project.figures?.length) return project.figures;
+        return (project.galleryImages || []).map((src) => ({ src, label: undefined, caption: undefined, chrome: true }));
+    }, [project.figures, project.galleryImages]);
+
+    /**
+     * The spine. Projects with `narrative` get the authored story with design decisions
+     * slotted after the second beat; everything else falls back to the legacy
+     * context → features → constraints → gallery order so no project regresses.
+     */
+    const chapters = useMemo<Chapter[]>(() => {
+        const out: Chapter[] = [];
+        const hasDecisions = !!project.designDecisions?.length;
+
+        if (project.narrative?.length) {
+            project.narrative.forEach((beat, i) => {
+                out.push({
+                    id: `chapter-${i}`,
+                    kind: 'beat',
+                    eyebrow: beat.eyebrow,
+                    heading: beat.heading,
+                    body: beat.body,
+                    aside: beat.aside,
+                    figures: beat.figures,
+                });
+                if (hasDecisions && i === 1) {
+                    out.push({
+                        id: 'decisions',
+                        kind: 'decisions',
+                        eyebrow: t('sections.designDecisions'),
+                        heading: t('sections.designDecisionsHeading'),
+                    });
+                }
+            });
+            if (hasDecisions && !out.some((c) => c.kind === 'decisions')) {
+                out.push({
+                    id: 'decisions',
+                    kind: 'decisions',
+                    eyebrow: t('sections.designDecisions'),
+                    heading: t('sections.designDecisionsHeading'),
+                });
+            }
+        } else {
+            out.push({
+                id: 'context',
+                kind: 'beat',
+                eyebrow: t('sections.missionBrief'),
+                heading: project.description,
+                body: [project.longDescription || project.description],
+            });
+            if (project.features?.length) {
+                out.push({
+                    id: 'features',
+                    kind: 'features',
+                    eyebrow: t('sections.keyFeatures'),
+                    heading: t('sections.keyFeaturesHeading'),
+                });
+            }
+            if (hasDecisions) {
+                out.push({
+                    id: 'decisions',
+                    kind: 'decisions',
+                    eyebrow: t('sections.designDecisions'),
+                    heading: t('sections.designDecisionsHeading'),
+                });
+            }
+            if (project.challengesAndSolutions?.length) {
+                out.push({
+                    id: 'constraints',
+                    kind: 'challenges',
+                    eyebrow: t('sections.engineeringChronicles'),
+                    heading: t('sections.constraintsHeading'),
+                });
+            }
+            if (figures.length) {
+                out.push({
+                    id: 'gallery',
+                    kind: 'gallery',
+                    eyebrow: t('sections.visualGallery'),
+                    heading: t('sections.visualGalleryHeading'),
+                });
+            }
+        }
+
+        if (project.installation?.length) {
+            out.push({
+                id: 'installation',
+                kind: 'install',
+                eyebrow: t('sections.installation'),
+                heading: t('sections.installation'),
+            });
+        }
+
+        return out;
+    }, [project, figures, t]);
+
+    /** Figures not claimed by a narrative beat still get shown, after the last chapter. */
+    const orphanFigures = useMemo(() => {
+        if (!project.narrative?.length) return [];
+        const claimed = new Set(project.narrative.flatMap((b) => b.figures || []));
+        return figures.map((_, i) => i).filter((i) => !claimed.has(i));
+    }, [project.narrative, figures]);
+
+    // Sticky rail: this route renders without the site navbar, so the rail is the
+    // only persistent orientation once the masthead scrolls away.
+    useEffect(() => {
+        const masthead = mastheadRef.current;
+        if (!masthead) return;
+        const observer = new IntersectionObserver(([entry]) => setShowRail(!entry.isIntersecting), {
+            rootMargin: '-72px 0px 0px 0px',
+        });
+        observer.observe(masthead);
+        return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
+        if (!chapters.length) return;
+        const nodes = chapters
+            .map((c) => document.getElementById(c.id))
+            .filter((n): n is HTMLElement => Boolean(n));
+        if (!nodes.length) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const visible = entries
+                    .filter((e) => e.isIntersecting)
+                    .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+                if (visible) setActiveChapter(visible.target.id);
+            },
+            { rootMargin: '-25% 0px -60% 0px' }
+        );
+        nodes.forEach((n) => observer.observe(n));
+        return () => observer.disconnect();
+    }, [chapters]);
+
     const otherProjects = useMemo(() => {
-        const others = portfolioData.projects.filter(p => p.id !== project.id);
-        // We take the first 5 projects. We avoid Math.random() here to prevent SSR hydration mismatch!
+        const others = portfolioData.projects.filter((p) => p.id !== project.id);
+        // First 5, not a random sample — Math.random() here would break SSR hydration.
         return others.slice(0, 5);
     }, [project.id]);
 
+    const activeIndex = chapters.findIndex((c) => c.id === activeChapter);
+
     return (
-        <div className="min-h-screen bg-background text-foreground pb-24 pt-24 sm:pt-32">
-
-            {/* 1. HEADER SECTION (Centered, Blog Style) */}
-            <div className="container max-w-7xl mx-auto px-6 mb-12 relative">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                >
-                    {/* Back Link */}
-                    <div className="flex items-center gap-4 mb-6">
-                        <div
-                            onClick={handleExit}
-                            className="flex items-center gap-2 text-sm text-muted-foreground font-medium hover:text-primary transition-colors group cursor-pointer"
-                        >
-                            <ArrowLeft className="w-4 h-4" />
-                            <span>{t('sections.backToProjects')}</span>
-                        </div>
-                    </div>
-
-                    {/* Title & Description - REMOVED max-w-4xl constraint for Title */}
-                    <div className="w-full">
-                        {/* Status Badge */}
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-6 border bg-secondary/10 dark:bg-secondary/5 border-black/20 dark:border-border/40 text-muted-foreground">
-                            <span className={cn("w-2 h-2 rounded-full", isOngoing ? "bg-emerald-500 animate-pulse" : "bg-blue-500")} />
-                            {isOngoing ? t('status.ongoing') : t('status.completed')}
-                        </div>
-
-                        {/* Full Width Layout for Title */}
-                        <h1 className="text-4xl md:text-5xl lg:text-7xl font-black tracking-tight text-foreground mb-6 leading-[1.0] break-words uppercase">
-                            {project.title}
-                        </h1>
-
-                        <p className="text-xl md:text-2xl text-muted-foreground/80 leading-relaxed max-w-3xl font-light mb-8">
-                            {project.description}
-                        </p>
-
-                        {/* Typewriter Effect (Subtext) */}
-                        <div className="font-mono text-sm text-emerald-500/80 mb-8 h-6 flex items-center">
-                            <Typewriter examples={[
-                                "Initiating project overview...",
-                                "Loading technical specifications...",
-                                "Decrypting success metrics..."
-                            ]} />
-                        </div>
-                    </div>
-                </motion.div>
-            </div>
-
-            {/* 2. HERO IMAGE SECTION (Dribbble-style browser mockup) */}
-            <div className="container max-w-7xl mx-auto px-6 mb-16">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.7, delay: 0.2 }}
-                >
-                    {project.image ? (
-                        <BrowserMockup
-                            url={project.demoUrl ? project.demoUrl.replace(/^https?:\/\//, '') : `${project.title.toLowerCase()}.app`}
-                            onClick={() => setSelectedImage(project.image!)}
-                        >
-                            <img
-                                src={project.image}
-                                alt={project.title}
-                                className="block h-auto w-full object-cover object-top"
-                            />
-                        </BrowserMockup>
-                    ) : (
-                        <div className="relative w-full aspect-video md:aspect-[2/1] overflow-hidden rounded-3xl border border-black/15 bg-secondary/5 shadow-2xl dark:border-border/40">
-                            <ProjectPlaceholder className="rounded-none border-0 bg-transparent pb-0 [&>div.z-10]:scale-125" title={project.title} />
-                        </div>
-                    )}
-                </motion.div>
-            </div>
-
-            {/* 3. METADATA BAR (Horizontal Strip) */}
-            <div className={cn(
-                'container max-w-7xl mx-auto px-6',
-                project.highlights && project.highlights.length > 0 ? 'mb-8' : 'mb-20'
-            )}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-4 border-y border-black/20 dark:border-border/40 py-8">
-                    <div className="flex flex-col gap-2">
-                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold flex items-center gap-2">
-                            <Code className="w-3 h-3" /> {t('metadata.role')}
-                        </span>
-                        <span className="font-bold text-foreground">{project.role || t('metadata.roleValue')}</span>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold flex items-center gap-2">
-                            <Clock className="w-3 h-3" /> {t('metadata.timeline')}
-                        </span>
-                        <span className="font-bold text-foreground">{project.customTimeline || formatDate(project.startDate)}</span>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold flex items-center gap-2">
-                            <Users className="w-3 h-3" /> {t('metadata.team')}
-                        </span>
-                        <span className="font-bold text-foreground">{project.team || t('metadata.teamValue')}</span>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold flex items-center gap-2">
-                            <Layers className="w-3 h-3" /> {t('metadata.techStack')}
-                        </span>
-                        <span className="font-bold text-foreground truncate">{t('metadata.techStackValue', { count: project.techStack.length })}</span>
-                    </div>
-                </div>
-            </div>
-
-            {/* 3b. HIGHLIGHTS PROOF STRIP */}
-            {project.highlights && project.highlights.length > 0 && (
-                <div className="container max-w-7xl mx-auto px-6 mb-20">
-                    <div className="flex flex-wrap gap-3">
-                        {project.highlights.map((item) => (
-                            <span
-                                key={item}
-                                className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-secondary/10 px-4 py-2 text-sm font-medium text-foreground dark:border-white/10 dark:bg-secondary/5"
+        <article className="min-h-screen bg-background pb-24 text-foreground">
+            {/* STICKY RAIL — replaces both the suppressed navbar and the old sidebar TOC */}
+            <AnimatePresence>
+                {showRail && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -12 }}
+                        transition={{ duration: 0.25 }}
+                        className={cn(
+                            'fixed inset-x-0 top-0 z-50 border-b bg-background',
+                            RULE
+                        )}
+                    >
+                        <div className={cn(SHELL, 'flex h-14 items-center justify-between gap-6')}>
+                            <button
+                                onClick={handleExit}
+                                className="flex shrink-0 items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                             >
-                                <Sparkles className="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
-                                {item}
-                            </span>
-                        ))}
-                    </div>
-                </div>
-            )}
+                                <ArrowLeft className="h-4 w-4" />
+                                <span className="hidden sm:inline">{project.title}</span>
+                            </button>
 
-            {/* 4. MAIN CONTENT GRID */}
-            <div className="container max-w-7xl mx-auto px-6">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-
-                    {/* LEFT COLUMN: Main Content (8 cols) */}
-                    <div className="lg:col-span-8 space-y-20">
-
-                        {/* MISSION OVERVIEW */}
-                        <section id="mission">
-                            <div className="flex items-center gap-3 mb-6">
-                                <span className="bg-emerald-500/10 text-emerald-500 p-2 rounded-lg">
-                                    <Box className="w-5 h-5" />
+                            {activeIndex >= 0 && (
+                                <span className={cn(EYEBROW, 'truncate')}>
+                                    {two(activeIndex + 1)} — {chapters[activeIndex].eyebrow}
                                 </span>
-                                <h2 className="text-2xl font-bold text-foreground">{t('sections.missionBrief')}</h2>
-                            </div>
-                            <div className="prose prose-lg dark:prose-invert prose-emerald max-w-none prose-headings:font-black prose-headings:tracking-tight prose-p:leading-loose text-zinc-600 dark:text-muted-foreground">
-                                <p>{project.longDescription || project.description}</p>
-                            </div>
-                        </section>
+                            )}
 
-                        {/* FEATURES (BENTO GRID - Adapted for 8 cols) */}
-                        {project.features && (
-                            <section id="features">
-                                <div className="flex items-center gap-3 mb-8">
-                                    <span className="bg-blue-500/10 text-blue-500 p-2 rounded-lg">
-                                        <Zap className="w-5 h-5" />
-                                    </span>
-                                    <h2 className="text-2xl font-bold text-foreground">{t('sections.keyFeatures')}</h2>
+                            {project.demoUrl && project.demoUrl !== '#' ? (
+                                <a
+                                    href={project.demoUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex shrink-0 items-center gap-1.5 text-sm font-medium text-foreground transition-opacity hover:opacity-70"
+                                >
+                                    <span className="hidden sm:inline">{t('sections.liveDemo')}</span>
+                                    <ArrowUpRight className="h-4 w-4" />
+                                </a>
+                            ) : (
+                                <span className="w-4" aria-hidden />
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* 1. MASTHEAD — one grid, one left edge, one rhythm */}
+            <header ref={mastheadRef} className={cn(SHELL, 'pt-20 sm:pt-28')}>
+                <button
+                    onClick={handleExit}
+                    className="group mb-14 flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                    <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                    <span>{t('sections.backToProjects')}</span>
+                </button>
+
+                <div className={cn(EYEBROW, 'flex flex-wrap items-center gap-x-3 gap-y-2')}>
+                    <span>{project.category || t('metadata.roleValue')}</span>
+                    {/* Separator only when both sit on one line — it orphans at the end of a wrap otherwise. */}
+                    <span aria-hidden className="hidden text-muted-foreground/40 sm:inline">
+                        /
+                    </span>
+                    <span className="flex items-center gap-2">
+                        <span
+                            className={cn(
+                                'h-1.5 w-1.5 rounded-full',
+                                isOngoing ? 'bg-foreground' : 'bg-muted-foreground/50'
+                            )}
+                        />
+                        {isOngoing ? t('status.ongoing') : t('status.completed')}
+                    </span>
+                </div>
+
+                <h1 className="mt-6 max-w-[14ch] text-balance text-[clamp(2.75rem,8vw,5.25rem)] font-semibold leading-[0.95] tracking-[-0.035em] text-foreground">
+                    {project.title}
+                </h1>
+
+                <p className="mt-8 max-w-[54ch] text-lg leading-relaxed text-muted-foreground md:text-xl">
+                    {project.premise || project.description}
+                </p>
+
+                {project.demoUrl && project.demoUrl !== '#' && (
+                    <a
+                        href={project.demoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-10 inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background transition-opacity hover:opacity-85"
+                    >
+                        {t('sections.liveDemo')}
+                        <ArrowUpRight className="h-4 w-4" />
+                    </a>
+                )}
+
+                {/* Meta strip — same left edge as the title */}
+                <dl className={cn('mt-16 grid grid-cols-2 gap-x-6 gap-y-8 border-t pt-8 md:grid-cols-3', RULE)}>
+                    <div className="flex flex-col gap-2">
+                        <dt className={EYEBROW}>{t('metadata.role')}</dt>
+                        <dd className="text-sm font-medium text-foreground">{project.role || t('metadata.roleValue')}</dd>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <dt className={EYEBROW}>{t('metadata.timeline')}</dt>
+                        <dd className="text-sm font-medium text-foreground">
+                            {project.customTimeline || formatDate(project.startDate)}
+                        </dd>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <dt className={EYEBROW}>{t('metadata.team')}</dt>
+                        <dd className="text-sm font-medium text-foreground">{project.team || t('metadata.teamValue')}</dd>
+                    </div>
+                </dl>
+
+                {/* Proof row — real figures, not decorated chips */}
+                {project.metrics?.length ? (
+                    <dl className={cn('mt-8 grid grid-cols-2 gap-x-6 gap-y-8 border-t pt-8 md:grid-cols-4', RULE)}>
+                        {project.metrics.map((m) => (
+                            <div key={m.label} className="flex flex-col gap-2">
+                                <dt className="font-mono text-3xl font-medium tabular-nums tracking-tight text-foreground md:text-4xl">
+                                    {m.value}
+                                </dt>
+                                <dd className="max-w-[22ch] text-xs leading-relaxed text-muted-foreground">{m.label}</dd>
+                            </div>
+                        ))}
+                    </dl>
+                ) : project.highlights?.length ? (
+                    <ul className={cn('mt-8 grid grid-cols-1 gap-x-6 gap-y-3 border-t pt-8 sm:grid-cols-2', RULE)}>
+                        {project.highlights.map((item) => (
+                            <li key={item} className="flex items-start gap-3 text-sm text-muted-foreground">
+                                <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-muted-foreground/60" />
+                                {item}
+                            </li>
+                        ))}
+                    </ul>
+                ) : null}
+            </header>
+
+            {/* 2. HERO FIGURE */}
+            <div className={cn(SHELL, 'mt-16')}>
+                {project.image ? (
+                    <figure className="space-y-4">
+                        <BrowserMockup url={mockupUrl} onClick={() => setSelectedImage(project.image!)}>
+                            <img src={project.image} alt={project.title} className="block h-auto w-full object-cover object-top" />
+                        </BrowserMockup>
+                        {project.imageCaption && (
+                            <figcaption className={cn('border-l pl-4 sm:pl-6', RULE)}>
+                                <span className="block max-w-[58ch] text-sm leading-relaxed text-muted-foreground">
+                                    {project.imageCaption}
+                                </span>
+                            </figcaption>
+                        )}
+                    </figure>
+                ) : (
+                    <div className={cn('relative aspect-video w-full overflow-hidden rounded-3xl border md:aspect-[2/1]', RULE)}>
+                        <ProjectPlaceholder
+                            className="rounded-none border-0 bg-transparent pb-0 [&>div.z-10]:scale-125"
+                            title={project.title}
+                        />
+                    </div>
+                )}
+            </div>
+
+            {/* 3. THE SPINE */}
+            <div className={cn(SHELL, 'mt-28 space-y-28 md:mt-36 md:space-y-36')}>
+                {chapters.map((chapter, i) => (
+                    <section key={chapter.id} id={chapter.id} className="scroll-mt-24">
+                        {/* Narrative beats run two columns — heading parked left, prose right.
+                            Evidence sections run full width. The alternation is the page rhythm. */}
+                        {chapter.kind === 'beat' ? (
+                            <div className={cn('grid grid-cols-1 gap-x-10 gap-y-8 border-t pt-8 lg:grid-cols-12', RULE)}>
+                                <div className="lg:col-span-5">
+                                    <ChapterHeading index={i + 1} eyebrow={chapter.eyebrow} heading={chapter.heading} sticky />
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {project.features.map((group, idx) => (
-                                        <motion.div
-                                            key={idx}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            whileInView={{ opacity: 1, y: 0 }}
-                                            viewport={{ once: true }}
-                                            className="p-6 rounded-2xl bg-secondary/10 dark:bg-secondary/5 border border-black/25 dark:border-white/5 hover:border-black/35 dark:hover:border-white/10 transition-colors shadow-sm dark:shadow-none"
-                                        >
-                                            <div className="w-10 h-10 rounded-xl bg-black/10 dark:bg-white/5 flex items-center justify-center mb-4 text-emerald-700 dark:text-emerald-500">
-                                                {idx === 0 ? <Box className="w-5 h-5" /> : idx === 1 ? <Terminal className="w-5 h-5" /> : idx === 2 ? <Zap className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
+                                <div className="lg:col-span-6 lg:col-start-7">
+                                    <Reveal delay={0.05}>
+                                        <div className={cn(PROSE, 'space-y-6')}>
+                                            {chapter.body?.map((para, pi) => (
+                                                <p key={pi} className="text-base leading-[1.75] text-muted-foreground md:text-lg">
+                                                    {renderRichText(para)}
+                                                </p>
+                                            ))}
+                                        </div>
+                                    </Reveal>
+                                    {chapter.aside && (
+                                        <Reveal delay={0.1}>
+                                            <p
+                                                className={cn(
+                                                    'mt-10 max-w-[46ch] border-l py-1 pl-6 text-base italic leading-relaxed text-foreground',
+                                                    RULE
+                                                )}
+                                            >
+                                                {chapter.aside}
+                                            </p>
+                                        </Reveal>
+                                    )}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className={cn('border-t pt-8', RULE)}>
+                                <ChapterHeading index={i + 1} eyebrow={chapter.eyebrow} heading={chapter.heading} />
+                            </div>
+                        )}
+
+                        {chapter.kind === 'beat' && (
+                            <>
+                                {chapter.figures?.map((fi) => {
+                                    const fig = figures[fi];
+                                    if (!fig) return null;
+                                    return (
+                                        <Figure
+                                            key={fig.src}
+                                            src={fig.src}
+                                            label={fig.label}
+                                            caption={fig.caption}
+                                            chrome={fig.chrome !== false}
+                                            mockupUrl={mockupUrl}
+                                            onOpen={() => setSelectedImage(fig.src)}
+                                        />
+                                    );
+                                })}
+                            </>
+                        )}
+
+                        {/* Decision / why it was made / what it cost / what it replaced */}
+                        {chapter.kind === 'decisions' && (
+                            <div className="mt-12">
+                                {project.designDecisions?.map((d, di) => (
+                                    <Reveal key={d.decision} delay={di * 0.03}>
+                                        <div className={cn('grid grid-cols-1 gap-6 border-t py-10 lg:grid-cols-12 lg:gap-10', RULE)}>
+                                            <div className="lg:col-span-5">
+                                                <span className={cn(EYEBROW, 'text-muted-foreground/60')}>{two(di + 1)}</span>
+                                                <h3 className="mt-3 max-w-[26ch] text-balance text-xl font-semibold leading-snug tracking-[-0.01em] text-foreground">
+                                                    {d.decision}
+                                                </h3>
                                             </div>
-                                            <h3 className="text-lg font-bold text-foreground mb-3">{group.title}</h3>
-                                            <ul className="space-y-2">
-                                                {group.items.map((item, i) => (
-                                                    <li key={i} className="text-sm text-muted-foreground flex gap-2 items-start">
-                                                        <span className="mt-1.5 w-1 h-1 rounded-full bg-emerald-500 shrink-0" />
+                                            <div className="space-y-6 lg:col-span-7">
+                                                <div>
+                                                    <span className={EYEBROW}>{t('sections.rationale')}</span>
+                                                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
+                                                        {d.rationale}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <span className={EYEBROW}>{t('sections.tradeoff')}</span>
+                                                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
+                                                        {d.tradeoff}
+                                                    </p>
+                                                </div>
+                                                {d.rejected && (
+                                                    <div>
+                                                        <span className={EYEBROW}>{t('sections.rejected')}</span>
+                                                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground/80">
+                                                            {d.rejected}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </Reveal>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Fallback: legacy feature groups */}
+                        {chapter.kind === 'features' && (
+                            <div className="mt-12 grid grid-cols-1 gap-x-10 gap-y-12 md:grid-cols-2">
+                                {project.features?.map((group, gi) => (
+                                    <Reveal key={group.title} delay={gi * 0.04}>
+                                        <div className={cn('border-t pt-6', RULE)}>
+                                            <h3 className="text-lg font-semibold text-foreground">{group.title}</h3>
+                                            <ul className="mt-4 space-y-3">
+                                                {group.items.map((item, ii) => (
+                                                    <li key={ii} className="flex gap-3 text-sm leading-relaxed text-muted-foreground">
+                                                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-muted-foreground/60" />
                                                         <span>{renderRichText(item)}</span>
                                                     </li>
                                                 ))}
                                             </ul>
-                                        </motion.div>
-                                    ))}
-                                </div>
-                            </section>
+                                        </div>
+                                    </Reveal>
+                                ))}
+                            </div>
                         )}
 
-                        {/* ENGINEERING CHRONICLES (TIMELINE) */}
-                        {project.challengesAndSolutions && (
-                            <section id="chronicles">
-                                <div className="flex items-center gap-3 mb-8">
-                                    <span className="bg-amber-500/10 text-amber-500 p-2 rounded-lg">
-                                        <Terminal className="w-5 h-5" />
-                                    </span>
-                                    <h2 className="text-2xl font-bold text-foreground">{t('sections.engineeringChronicles')}</h2>
-                                </div>
-                                <div className="relative border-l border-black/40 dark:border-white/10 ml-3 space-y-12 pl-8 pb-4">
-                                    {project.challengesAndSolutions.map((item, idx) => (
-                                        <div key={idx} className="relative group">
-                                            <div className="absolute -left-[37px] top-1 w-4 h-4 rounded-full bg-background border-2 border-black/40 dark:border-white/10 group-hover:border-amber-500 transition-colors z-10" />
-                                            <h4 className="text-lg font-bold text-foreground mb-2 group-hover:text-amber-500 transition-colors">
-                                                {item.problem}
-                                            </h4>
-                                            <div className="text-sm text-zinc-600 dark:text-muted-foreground pl-4 border-l border-black/30 dark:border-white/5">
-                                                <span className="text-emerald-700 dark:text-emerald-500 font-bold text-xs uppercase tracking-wider block mb-1">{t('sections.solution')}</span>
-                                                {item.solution}
+                        {/* Fallback: problem → solution pairs */}
+                        {chapter.kind === 'challenges' && (
+                            <div className="mt-12">
+                                {project.challengesAndSolutions?.map((item, ci) => (
+                                    <Reveal key={ci} delay={ci * 0.03}>
+                                        <div className={cn('grid grid-cols-1 gap-6 border-t py-10 lg:grid-cols-12 lg:gap-10', RULE)}>
+                                            <div className="lg:col-span-5">
+                                                <span className={cn(EYEBROW, 'text-muted-foreground/60')}>{two(ci + 1)}</span>
+                                                <h3 className="mt-3 max-w-[26ch] text-balance text-xl font-semibold leading-snug text-foreground">
+                                                    {item.problem}
+                                                </h3>
+                                            </div>
+                                            <div className="lg:col-span-7">
+                                                <span className={EYEBROW}>{t('sections.solution')}</span>
+                                                <p className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
+                                                    {item.solution}
+                                                </p>
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
-                            </section>
+                                    </Reveal>
+                                ))}
+                            </div>
                         )}
 
-                        {/* GALLERY (Vertical Stack, Limit 2) */}
-                        {project.galleryImages && project.galleryImages.length > 0 && (
-                            <section id="gallery">
-                                <div className="flex items-center gap-3 mb-8">
-                                    <span className="bg-purple-500/10 text-purple-500 p-2 rounded-lg">
-                                        <LayoutGrid className="w-5 h-5" />
-                                    </span>
-                                    <h2 className="text-2xl font-bold text-foreground">{t('sections.visualGallery')}</h2>
-                                </div>
-                                <ProjectGallery
-                                    images={project.galleryImages}
-                                    onImageClick={(img) => setSelectedImage(img)}
-                                    viewMoreText={t('sections.viewMore')}
-                                    viewLessText={t('sections.viewLess')}
-                                    mockupUrl={
-                                        project.demoUrl
-                                            ? project.demoUrl.replace(/^https?:\/\//, '')
-                                            : `${project.title.toLowerCase()}.app`
-                                    }
+                        {chapter.kind === 'gallery' &&
+                            figures.map((fig) => (
+                                <Figure
+                                    key={fig.src}
+                                    src={fig.src}
+                                    label={fig.label}
+                                    caption={fig.caption}
+                                    chrome={fig.chrome !== false}
+                                    mockupUrl={mockupUrl}
+                                    onOpen={() => setSelectedImage(fig.src)}
                                 />
-                            </section>
-                        )}
+                            ))}
 
-                        {/* INSTALLATION */}
-                        {project.installation && (
-                            <section id="installation">
-                                <div className="flex items-center gap-3 mb-8">
-                                    <span className="bg-emerald-500/10 text-emerald-500 p-2 rounded-lg">
-                                        <Terminal className="w-5 h-5" />
-                                    </span>
-                                    <h2 className="text-2xl font-bold text-foreground">{t('sections.installation')}</h2>
-                                </div>
-                                <div className="space-y-6">
-                                    {project.installation.map((step, idx) => (
-                                        <div key={idx}>
-                                            {step.type === 'code' ? (
-                                                <TerminalBlock
-                                                    title={step.title}
-                                                    code={step.cmd || step.code || ''}
-                                                />
-                                            ) : (
-                                                <div className="bg-secondary/20 dark:bg-secondary/5 p-6 rounded-2xl border border-black/10 dark:border-white/5">
-                                                    <h3 className="text-base font-bold text-foreground mb-3 flex items-center gap-2">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-700 dark:bg-emerald-500" />
-                                                        {step.title}
-                                                    </h3>
-                                                    <p className="text-sm text-muted-foreground leading-relaxed">
-                                                        {step.code || step.cmd}
-                                                    </p>
-                                                </div>
-                                            )}
-                                        </div>
+                        {chapter.kind === 'install' && (
+                            <div className="mt-10 space-y-6">
+                                {project.installation?.map((step, si) => (
+                                    <div key={si}>
+                                        {step.type === 'code' ? (
+                                            <TerminalBlock title={step.title} code={step.cmd || step.code || ''} />
+                                        ) : (
+                                            <div className={cn('rounded-xl border p-6', RULE)}>
+                                                <h3 className="text-base font-semibold text-foreground">{step.title}</h3>
+                                                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                                                    {step.code || step.cmd}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </section>
+                ))}
+
+                {orphanFigures.length > 0 && (
+                    <section id="figures" className="scroll-mt-24">
+                        <div className={cn('border-t pt-8', RULE)}>
+                            <ChapterHeading
+                                index={chapters.length + 1}
+                                eyebrow={t('sections.visualGallery')}
+                                heading={t('sections.visualGalleryHeading')}
+                            />
+                        </div>
+                        {orphanFigures.map((fi) => {
+                            const fig = figures[fi];
+                            return (
+                                <Figure
+                                    key={fig.src}
+                                    src={fig.src}
+                                    label={fig.label}
+                                    caption={fig.caption}
+                                    chrome={fig.chrome !== false}
+                                    mockupUrl={mockupUrl}
+                                    onOpen={() => setSelectedImage(fig.src)}
+                                />
+                            );
+                        })}
+                    </section>
+                )}
+            </div>
+
+            {/* 4. COLOPHON — where the old sidebar's contents live now */}
+            <div className={cn(SHELL, 'mt-32')}>
+                <Reveal>
+                    <div className={cn('border-t pt-8', RULE)}>
+                        <span className={EYEBROW}>{t('sections.colophon')}</span>
+                        <div className="mt-8 grid grid-cols-1 gap-x-10 gap-y-10 md:grid-cols-3">
+                            <div>
+                                <h3 className={EYEBROW}>{t('sections.technologies')}</h3>
+                                <ul className="mt-4 space-y-2">
+                                    {project.techStack.map((tech) => (
+                                        <li key={tech} className="text-sm text-muted-foreground">
+                                            {tech}
+                                        </li>
                                     ))}
+                                </ul>
+                            </div>
+                            {project.tools?.length > 0 && (
+                                <div>
+                                    <h3 className={EYEBROW}>{t('tools')}</h3>
+                                    <ul className="mt-4 space-y-2">
+                                        {project.tools.map((tool) => (
+                                            <li key={tool} className="text-sm text-muted-foreground">
+                                                {tool}
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
-                            </section>
-                        )}
-
-                    </div>
-
-                    {/* RIGHT COLUMN: Sticky Sidebar (4 cols) */}
-                    <div className="lg:col-span-4 relative">
-                        <div className="sticky top-20 space-y-8">
-
-                            {/* Actions Card */}
-                            <div className="p-6 rounded-2xl bg-white dark:bg-secondary/5 border border-black/20 dark:border-white/10 backdrop-blur-sm shadow-sm dark:shadow-none">
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-6">{t('sections.projectAccess')}</h3>
-                                <div className="flex flex-col gap-3">
-                                    {project.demoUrl && (
-                                        <motion.a
-                                            href={project.demoUrl === '#' ? undefined : project.demoUrl}
-                                            target={project.demoUrl === '#' ? undefined : "_blank"}
-                                            rel={project.demoUrl === '#' ? undefined : "noopener noreferrer"}
-                                            className={cn(
-                                                "flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm transition-all",
-                                                project.demoUrl === '#'
-                                                    ? "bg-zinc-800 text-zinc-500 cursor-not-allowed opacity-50 border border-white/5"
-                                                    : "bg-foreground text-background hover:opacity-90 shadow-lg shadow-black/20"
-                                            )}
-                                            whileHover={project.demoUrl === '#' ? {} : { scale: 1.02 }}
-                                            whileTap={project.demoUrl === '#' ? {} : { scale: 0.98 }}
+                            )}
+                            <div className="flex flex-col items-start gap-3">
+                                <h3 className={EYEBROW}>{t('sections.projectAccess')}</h3>
+                                <div className="mt-1 flex flex-col gap-3">
+                                    {project.demoUrl && project.demoUrl !== '#' && (
+                                        <a
+                                            href={project.demoUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-2 text-sm font-medium text-foreground underline-offset-4 hover:underline"
                                         >
-                                            <span>{t('sections.liveDemo')}</span>
-                                            <ExternalLink className="w-4 h-4" />
-                                        </motion.a>
+                                            {t('sections.liveDemo')}
+                                            <ArrowUpRight className="h-4 w-4" />
+                                        </a>
                                     )}
                                     {project.repoUrl && (
-                                        <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm bg-black/10 dark:bg-secondary/10 hover:bg-black/20 dark:hover:bg-secondary/20 text-foreground transition-all border border-black/5 dark:border-transparent hover:border-black/10 dark:hover:border-white/5">
-                                            <Github className="w-4 h-4" />
-                                            <span>{t('sections.sourceCode')}</span>
+                                        <a
+                                            href={project.repoUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-2 text-sm font-medium text-foreground underline-offset-4 hover:underline"
+                                        >
+                                            <Github className="h-4 w-4" />
+                                            {t('sections.sourceCode')}
                                         </a>
                                     )}
                                 </div>
                             </div>
-
-                            {/* Tech Stack Tags */}
-                            <div>
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-6 pb-4 border-b border-black/25 dark:border-white/5">{t('sections.technologies')}</h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {project.techStack.map(tech => (
-                                        <div key={tech} className="px-3 py-1.5 bg-secondary/20 dark:bg-secondary/5 border border-black/20 dark:border-white/5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:border-black/30 dark:hover:border-white/10 transition-colors cursor-default">
-                                            {tech}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Table of Contents (Functional) */}
-                            <div>
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-6 pb-4 border-b border-black/25 dark:border-white/5">{t('sections.contents')}</h3>
-                                <ul className="space-y-3 text-sm text-muted-foreground">
-                                    <li onClick={() => document.getElementById('mission')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground cursor-pointer transition-colors hover:translate-x-1 duration-200 block">• {t('sections.missionBrief')}</li>
-                                    {project.features && <li onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground cursor-pointer transition-colors hover:translate-x-1 duration-200 block">• {t('sections.keyFeatures')}</li>}
-                                    {project.challengesAndSolutions && <li onClick={() => document.getElementById('chronicles')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground cursor-pointer transition-colors hover:translate-x-1 duration-200 block">• {t('sections.engineeringChronicles')}</li>}
-                                    {project.galleryImages && <li onClick={() => document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground cursor-pointer transition-colors hover:translate-x-1 duration-200 block">• {t('sections.visualGallery')}</li>}
-                                    {project.installation && <li onClick={() => document.getElementById('installation')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground cursor-pointer transition-colors hover:translate-x-1 duration-200 block">• {t('sections.installation')}</li>}
-                                </ul>
-                            </div>
-
                         </div>
                     </div>
-
-                </div>
+                </Reveal>
             </div>
 
-            {/* 5. FOOTER NAVIGATION (Back & More Projects) */}
-            <div className="container max-w-7xl mx-auto px-6 mt-32 border-t border-border/40 pt-16">
+            {/* 5. FOOTER NAVIGATION */}
+            <div className={cn(SHELL, 'mt-28')}>
+                <button
+                    onClick={handleExit}
+                    className="group mb-16 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                    <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                    <span>{t('sections.backToProjects')}</span>
+                </button>
 
-                {/* Back Link Bottom */}
-                <div className="mb-16">
-                    <div
-                        onClick={handleExit}
-                        className="inline-flex items-center gap-2 text-muted-foreground font-medium hover:text-primary transition-colors group cursor-pointer"
-                    >
-                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                        <span>{t('sections.backToProjects')}</span>
-                    </div>
-                </div>
-
-                {/* MORE PROJECTS CAROUSEL */}
-                <div className="relative group">
-                    <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-2xl font-bold">{t('sections.moreProjects')}</h2>
+                <div className={cn('border-t pt-8', RULE)}>
+                    <div className="mb-8 flex items-center justify-between">
+                        <h2 className={EYEBROW}>{t('sections.moreProjects')}</h2>
                         <div className="flex gap-2">
                             <button
-                                onClick={() => {
-                                    if (scrollContainerRef.current) {
-                                        scrollContainerRef.current.scrollBy({ left: -scrollContainerRef.current.clientWidth / 3, behavior: 'smooth' });
-                                    }
-                                }}
-                                className="p-2 rounded-full border border-black/10 dark:border-white/10 bg-black/10 dark:bg-secondary/5 hover:bg-black/20 dark:hover:bg-white/10 transition-colors text-muted-foreground hover:text-foreground"
+                                onClick={() =>
+                                    scrollContainerRef.current?.scrollBy({
+                                        left: -scrollContainerRef.current.clientWidth / 3,
+                                        behavior: 'smooth',
+                                    })
+                                }
+                                className={cn(
+                                    'rounded-full border p-2 text-muted-foreground transition-colors hover:text-foreground',
+                                    RULE
+                                )}
+                                aria-label="Previous"
                             >
-                                <ChevronLeft className="w-5 h-5" />
+                                <ChevronLeft className="h-4 w-4" />
                             </button>
                             <button
-                                onClick={() => {
-                                    if (scrollContainerRef.current) {
-                                        scrollContainerRef.current.scrollBy({ left: scrollContainerRef.current.clientWidth / 3, behavior: 'smooth' });
-                                    }
-                                }}
-                                className="p-2 rounded-full border border-black/10 dark:border-white/10 bg-black/10 dark:bg-secondary/5 hover:bg-black/20 dark:hover:bg-white/10 transition-colors text-muted-foreground hover:text-foreground"
+                                onClick={() =>
+                                    scrollContainerRef.current?.scrollBy({
+                                        left: scrollContainerRef.current.clientWidth / 3,
+                                        behavior: 'smooth',
+                                    })
+                                }
+                                className={cn(
+                                    'rounded-full border p-2 text-muted-foreground transition-colors hover:text-foreground',
+                                    RULE
+                                )}
+                                aria-label="Next"
                             >
-                                <ChevronRight className="w-5 h-5" />
+                                <ChevronRight className="h-4 w-4" />
                             </button>
                         </div>
                     </div>
 
                     <div
                         ref={scrollContainerRef}
-                        className="flex gap-6 overflow-x-auto pb-4 snap-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] -mx-6 px-6"
+                        className="-mx-6 flex snap-x gap-6 overflow-x-auto px-6 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']"
                     >
-                        {otherProjects.map((p, i) => (
+                        {otherProjects.map((p) => (
                             <Link
                                 href={`/projects/${p.slug}`}
                                 key={p.id}
-                                className="flex-none w-[85vw] md:w-[calc(33.333%-1rem)] snap-center group relative aspect-video rounded-xl overflow-hidden border border-black/30 dark:border-white/10 bg-zinc-200 dark:bg-zinc-900 shadow-md dark:shadow-none"
+                                className="group flex-none snap-center md:w-[calc(50%-0.75rem)] w-[80vw]"
                             >
-                                {/* Background Layer */}
-                                {p.image ? (
-                                    <img src={p.image} alt={p.title} loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                                ) : (
-                                    <ProjectPlaceholder className="absolute inset-0" title={p.title} />
-                                )}
-
-                                {/* Gradient Overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 transition-opacity group-hover:opacity-90" />
-
-                                {/* Content Overlay */}
-                                <div className="absolute bottom-0 left-0 w-full p-5 flex flex-col justify-end">
-                                    <div className="mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
-                                        <span className={cn(
-                                            "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium backdrop-blur-md",
-                                            p.status === 'ongoing'
-                                                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                                                : "border-blue-500/30 bg-blue-500/10 text-blue-400"
-                                        )}>
-                                            {p.status === 'ongoing' ? 'In Progress' : 'Completed'}
-                                        </span>
-                                    </div>
-                                    <h3 className="font-bold text-lg leading-tight text-white mb-1 group-hover:text-primary transition-colors line-clamp-1">
-                                        {p.title}
-                                    </h3>
-                                    <p className="text-sm text-zinc-400 line-clamp-1">
-                                        {p.techStack[0]} • {p.category || "Development"}
-                                    </p>
+                                <div className={cn('relative aspect-[16/10] overflow-hidden rounded-xl border bg-secondary/20', RULE)}>
+                                    {p.image ? (
+                                        <img
+                                            src={p.image}
+                                            alt={p.title}
+                                            loading="lazy"
+                                            className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
+                                        />
+                                    ) : (
+                                        <ProjectPlaceholder className="absolute inset-0" title={p.title} />
+                                    )}
                                 </div>
+                                <div className="mt-4 flex items-baseline justify-between gap-4">
+                                    <h3 className="text-base font-semibold text-foreground">{p.title}</h3>
+                                    <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                                </div>
+                                <p className={cn(EYEBROW, 'mt-2 block')}>{p.category || p.techStack[0]}</p>
                             </Link>
                         ))}
                     </div>
                 </div>
-
             </div>
 
-            {/* Image Lightbox - Independent Portal */}
+            {/* Lightbox */}
             <AnimatePresence>
                 {selectedImage && (
                     <motion.div
@@ -614,20 +855,22 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setSelectedImage(null)}
-                        className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 cursor-zoom-out"
+                        className="fixed inset-0 z-[200] flex cursor-zoom-out items-center justify-center bg-black/95 p-4 backdrop-blur-xl"
                     >
-                        <motion.img
-                            layoutId={`project-img-${selectedImage}`}
+                        <img
                             src={selectedImage}
-                            alt="Lightbox View"
-                            className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+                            alt=""
+                            className="max-h-[90vh] max-w-full rounded-lg object-contain shadow-2xl"
                         />
-                        <button className="absolute top-4 right-4 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors">
-                            <X className="w-6 h-6" />
+                        <button
+                            className="absolute right-4 top-4 rounded-full bg-white/10 p-3 text-white transition-colors hover:bg-white/20"
+                            aria-label="Close"
+                        >
+                            <X className="h-6 w-6" />
                         </button>
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+        </article>
     );
 }

@@ -24,6 +24,41 @@ export interface Project {
     team?: string;
     customTimeline?: string;
     role?: string;
+
+    // --- Case-study fields (optional) ---
+    // Projects that fill these render as an editorial case study;
+    // projects that don't fall back to longDescription/features/challengesAndSolutions.
+
+    /** One-sentence thesis shown under the title in the masthead. */
+    premise?: string;
+    /** Caption for the masthead hero image. */
+    imageCaption?: string;
+    /** Proof row in the masthead. Replaces highlight chips when present. */
+    metrics?: { value: string; label: string }[];
+    /** Ordered narrative beats — the scroll story. Rendered as numbered sections. */
+    narrative?: {
+        eyebrow: string;
+        heading: string;
+        body: string[];
+        aside?: string;
+        /** Indices into `figures` to render after this beat. */
+        figures?: number[];
+    }[];
+    /** What was decided, why, and what it cost. The design-considerations section. */
+    designDecisions?: {
+        decision: string;
+        rationale: string;
+        tradeoff: string;
+        rejected?: string;
+    }[];
+    /** Curated, captioned images. When set, overrides filesystem image discovery. */
+    figures?: {
+        src: string;
+        label: string;
+        caption: string;
+        /** Render inside the browser mockup frame. Defaults to true. */
+        chrome?: boolean;
+    }[];
 }
 
 export interface Experience {

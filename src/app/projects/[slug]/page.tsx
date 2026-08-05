@@ -19,6 +19,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         notFound();
     }
 
+    // Projects with a curated, captioned figure set opt out of filesystem discovery —
+    // discovery picks up every public/project/<name><n> file, including ones that
+    // belong to a different product.
+    if (project.figures?.length) {
+        return <ProjectPageContent project={project} />;
+    }
+
     // Fetch dynamic images from public/project folder
     const galleryImages = await getProjectImages(slug, project.title);
 
