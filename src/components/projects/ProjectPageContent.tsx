@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, type MouseEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { X, Code, Box, ExternalLink, Github, Terminal, ChevronRight, ChevronLeft, Copy, Check, Zap, Sparkles, ArrowLeft, Clock, Users, Layers, LayoutGrid } from 'lucide-react';
@@ -81,58 +81,175 @@ const renderRichText = (text: string) => {
     });
 };
 
-// --- Vertical Gallery Component (browser mockup frames) ---
-const ProjectGallery = ({
-    images,
-    onImageClick,
-    viewMoreText,
-    viewLessText,
+// --- Single teaser image → opens modal slideshow ---
+const ProjectGalleryTeaser = ({
+    image,
+    imageCount,
+    onOpen,
     mockupUrl,
 }: {
-    images: string[];
-    onImageClick: (img: string) => void;
-    viewMoreText: string;
-    viewLessText: string;
+    image: string;
+    imageCount: number;
+    onOpen: () => void;
     mockupUrl?: string;
 }) => {
-    const [showAll, setShowAll] = useState(false);
-    const visibleImages = showAll ? images : images.slice(0, 2);
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-10%' }}
+            transition={{ duration: 0.6 }}
+            className="pb-4"
+        >
+            <BrowserMockup url={mockupUrl} onClick={onOpen}>
+                <img
+                    src={image}
+                    alt="Visual gallery preview"
+                    loading="lazy"
+                    className="block h-auto w-full object-cover object-top"
+                />
+            </BrowserMockup>
+            {imageCount > 1 && (
+                <p className="mt-4 text-center text-sm text-muted-foreground">
+                    Click to view all {imageCount} images
+                </p>
+            )}
+        </motion.div>
+    );
+};
+
+// --- Modal slideshow with thumbnail strip ---
+const GallerySlideshow = ({
+    images,
+    index,
+    onIndexChange,
+    onClose,
+}: {
+    images: string[];
+    index: number;
+    onIndexChange: (index: number) => void;
+    onClose: () => void;
+}) => {
+    const thumbRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose();
+            if (e.key === 'ArrowRight') onIndexChange((index + 1) % images.length);
+            if (e.key === 'ArrowLeft') onIndexChange((index - 1 + images.length) % images.length);
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [index, images.length, onClose, onIndexChange]);
+
+    useEffect(() => {
+        thumbRefs.current[index]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }, [index]);
+
+    const goPrev = (e: MouseEvent) => {
+        e.stopPropagation();
+        onIndexChange((index - 1 + images.length) % images.length);
+    };
+    const goNext = (e: MouseEvent) => {
+        e.stopPropagation();
+        onIndexChange((index + 1) % images.length);
+    };
+
+    useEffect(() => {
+        const prev = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = prev;
+        };
+    }, []);
 
     return (
-        <div className="flex flex-col gap-8 pb-12">
-            <div className="flex flex-col gap-10">
-                {visibleImages.map((img, idx) => (
-                    <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: '-10%' }}
-                        transition={{ duration: 0.6, delay: idx * 0.1 }}
-                    >
-                        <BrowserMockup url={mockupUrl} onClick={() => onImageClick(img)}>
-                            <img
-                                src={img}
-                                alt={`Gallery Image ${idx + 1}`}
-                                loading="lazy"
-                                className="block h-auto w-full object-cover object-top"
-                            />
-                        </BrowserMockup>
-                    </motion.div>
-                ))}
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 z-[200] flex flex-col bg-black/95 backdrop-blur-xl"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Image gallery"
+        >
+            <button
+                type="button"
+                onClick={onClose}
+                className="absolute top-4 right-4 z-10 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                aria-label="Close gallery"
+            >
+                <X className="w-6 h-6" />
+            </button>
+
+            <div className="relative flex min-h-0 flex-1 items-center justify-center px-4 pt-16 pb-4 sm:px-16">
+                {images.length > 1 && (
+                    <>
+                        <button
+                            type="button"
+                            onClick={goPrev}
+                            className="absolute left-2 sm:left-4 z-10 p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                            aria-label="Previous image"
+                        >
+                            <ChevronLeft className="w-6 h-6" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={goNext}
+                            className="absolute right-2 sm:right-4 z-10 p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                            aria-label="Next image"
+                        >
+                            <ChevronRight className="w-6 h-6" />
+                        </button>
+                    </>
+                )}
+
+                <motion.img
+                    key={images[index]}
+                    initial={{ opacity: 0.4, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.2 }}
+                    src={images[index]}
+                    alt={`Gallery image ${index + 1} of ${images.length}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="max-h-full max-w-full object-contain rounded-lg shadow-2xl cursor-default"
+                />
             </div>
 
-            {images.length > 2 && (
-                <div className="flex justify-center pt-4">
-                    <button
-                        onClick={() => setShowAll(!showAll)}
-                        className="px-6 py-3 rounded-full border border-border/40 hover:bg-secondary/10 transition-colors text-sm font-bold tracking-wide uppercase flex items-center gap-2 group"
-                    >
-                        <span>{showAll ? viewLessText : viewMoreText}</span>
-                        <ChevronRight className={cn('w-4 h-4 transition-transform duration-300', showAll ? 'rotate-[-90deg]' : 'rotate-90')} />
-                    </button>
+            {images.length > 1 && (
+                <div
+                    onClick={(e) => e.stopPropagation()}
+                    className="shrink-0 border-t border-white/10 bg-black/40 px-4 py-3"
+                >
+                    <div className="mx-auto flex max-w-4xl gap-2 overflow-x-auto pb-1 scrollbar-thin">
+                        {images.map((img, i) => (
+                            <button
+                                key={`${img}-${i}`}
+                                type="button"
+                                ref={(el) => {
+                                    thumbRefs.current[i] = el;
+                                }}
+                                onClick={() => onIndexChange(i)}
+                                className={cn(
+                                    'relative h-14 w-20 sm:h-16 sm:w-24 shrink-0 overflow-hidden rounded-md border-2 transition-all',
+                                    i === index
+                                        ? 'border-brand opacity-100'
+                                        : 'border-transparent opacity-50 hover:opacity-80'
+                                )}
+                                aria-label={`View image ${i + 1}`}
+                                aria-current={i === index}
+                            >
+                                <img src={img} alt="" className="h-full w-full object-cover object-top" />
+                            </button>
+                        ))}
+                    </div>
+                    <p className="mt-2 text-center text-xs text-white/40 font-mono">
+                        {index + 1} / {images.length}
+                    </p>
                 </div>
             )}
-        </div>
+        </motion.div>
     );
 };
 
@@ -180,8 +297,22 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
     const tCommon = useTranslations('common');
     const router = useRouter();
     const isOngoing = project.status === 'ongoing';
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    /** Hero first, then gallery shots (deduped) — one slideshow for the page */
+    const slideshowImages = useMemo(() => {
+        const gallery = project.galleryImages ?? [];
+        if (project.image && !gallery.includes(project.image)) {
+            return [project.image, ...gallery];
+        }
+        return gallery.length > 0 ? gallery : project.image ? [project.image] : [];
+    }, [project.image, project.galleryImages]);
+
+    const openSlideshow = (index: number) => {
+        if (slideshowImages.length === 0) return;
+        setLightboxIndex(Math.max(0, Math.min(index, slideshowImages.length - 1)));
+    };
 
     const handleExit = () => {
         if (typeof window !== 'undefined' && document.referrer.includes('/projects')) {
@@ -258,7 +389,7 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                     {project.image ? (
                         <BrowserMockup
                             url={project.demoUrl ? project.demoUrl.replace(/^https?:\/\//, '') : `${project.title.toLowerCase()}.app`}
-                            onClick={() => setSelectedImage(project.image!)}
+                            onClick={() => openSlideshow(0)}
                         >
                             <img
                                 src={project.image}
@@ -406,7 +537,7 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                             </section>
                         )}
 
-                        {/* GALLERY (Vertical Stack, Limit 2) */}
+                        {/* GALLERY — single teaser → modal slideshow */}
                         {project.galleryImages && project.galleryImages.length > 0 && (
                             <section id="gallery">
                                 <div className="flex items-center gap-3 mb-8">
@@ -415,11 +546,15 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                                     </span>
                                     <h2 className="text-2xl font-bold text-foreground">{t('sections.visualGallery')}</h2>
                                 </div>
-                                <ProjectGallery
-                                    images={project.galleryImages}
-                                    onImageClick={(img) => setSelectedImage(img)}
-                                    viewMoreText={t('sections.viewMore')}
-                                    viewLessText={t('sections.viewLess')}
+                                <ProjectGalleryTeaser
+                                    image={project.galleryImages[0]}
+                                    imageCount={slideshowImages.length}
+                                    onOpen={() => {
+                                        const start = project.image
+                                            ? slideshowImages.indexOf(project.galleryImages![0])
+                                            : 0;
+                                        openSlideshow(start >= 0 ? start : 0);
+                                    }}
                                     mockupUrl={
                                         project.demoUrl
                                             ? project.demoUrl.replace(/^https?:\/\//, '')
@@ -619,26 +754,15 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
 
             </div>
 
-            {/* Image Lightbox - Independent Portal */}
+            {/* Gallery slideshow modal */}
             <AnimatePresence>
-                {selectedImage && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => setSelectedImage(null)}
-                        className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 cursor-zoom-out"
-                    >
-                        <motion.img
-                            layoutId={`project-img-${selectedImage}`}
-                            src={selectedImage}
-                            alt="Lightbox View"
-                            className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
-                        />
-                        <button className="absolute top-4 right-4 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors">
-                            <X className="w-6 h-6" />
-                        </button>
-                    </motion.div>
+                {lightboxIndex !== null && slideshowImages.length > 0 && (
+                    <GallerySlideshow
+                        images={slideshowImages}
+                        index={lightboxIndex}
+                        onIndexChange={setLightboxIndex}
+                        onClose={() => setLightboxIndex(null)}
+                    />
                 )}
             </AnimatePresence>
         </div>
