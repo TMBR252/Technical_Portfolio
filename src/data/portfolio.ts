@@ -43,78 +43,79 @@ export const portfolioData: PortfolioData = {
             slug: 'primer-landing-page',
             title: 'Primer',
             description:
-                'The landing page for Primer, the Primitive product — an address in, a feasibility answer out, in under a minute.',
+                'I designed and built the Primer marketing site from 0→1 — a product-first surface where the first interaction is the feasibility search itself.',
             longDescription:
-                'Designed and built primer.city, the marketing surface for Primer, the Primitive product. The page leads with the product itself rather than a description of it: a live address search sits directly in the hero, so the first interaction a visitor has is the same one the product is built around — type a property address, get a feasibility read back. Supporting proof is carried by the interface rather than by copy, with live parcel coverage, county count, and median run time surfaced as running system state beneath the search field. Owned both the visual system and the Vite/React architecture across pricing, use cases, insights, contact, and early access.',
+                'Primer answers whether a real-estate project is feasible from an address in under a minute. A brochure site would undersell that — visitors need to feel the product before they sign up. I designed and implemented primer.city end to end: the visual system and the Vite/React marketing OS across home, pricing, use cases, insights, contact, access, and legal, so the first interaction matches the product itself — type a property address, get a feasibility read back.',
             techStack: ['Vite', 'React', 'React Router', 'Mapbox GL', 'CSS Design Tokens', 'Vercel'],
             tools: ['Figma', 'Cursor', 'Claude Code'],
             status: 'ongoing',
             startDate: '2026-01-01',
-            role: 'Product & Design Lead',
+            role: 'Product & Design Lead (Design Engineer)',
             customTimeline: '2026 — Present',
             team: 'Founder',
             category: 'Design Engineering',
             demoUrl: 'https://primer.city',
             highlights: [
-                'Avg 58s feasibility reports',
-                '3,142 counties of live parcel data',
-                'Page → Section → Area → Frame architecture',
-                'Passcode-gated early access before the platform',
+                'Designed and engineered end to end',
+                'Live at primer.city',
+                'Multi-page marketing system',
+                'Passcode-gated platform entry',
             ],
             features: [
                 {
                     title: 'Product-First Hero',
                     items: [
-                        'Put the working address search in the hero so the first interaction is the product, not a form.',
-                        'Anchored the headline on the promise the product is measured against — **a feasibility answer in under a minute**.',
-                        'Framed pre-filled example properties as real results, each carrying its unit count and uIRR, so the value is legible before a visitor types anything.',
+                        'Put the working address search, promise headline, and example result chips in the first viewport so the first interaction is the product, not a signup form.',
+                        'Locked the headline to the measurable promise — **a feasibility answer in under a minute** — instead of generic marketing copy.',
+                        'Implemented it as a composed **HeroSection** with search/copy areas — a live UI composition, not a static marketing image.',
                     ],
                 },
                 {
-                    title: 'Proof Through Interface',
+                    title: 'Proof in the Interface',
                     items: [
-                        'Surfaced live parcel coverage, county count, and median run time under the search field as running system state.',
-                        'Let product surfaces — property detail, parcel map, saved sets — do the explaining in place of feature copy.',
-                        'Sticky product-flow showcase walks site search → zoning → map layers → capacity → comps → export.',
+                        'Surfaced live parcel coverage, county count, and median run time under the search as running system state so proof sits in the UI, not in a feature list.',
+                        'Showed product surfaces — property detail, parcel map, saved sets — without forcing signup.',
+                        'Built a dashboard mock band and sticky **product-flow** sections wired with real UI captures so visitors see the product without loading the app.',
                     ],
                 },
                 {
-                    title: 'Visual System & Brand',
+                    title: 'Visual System That Scales',
                     items: [
-                        'Light gray grain stage with black accent chips and a floating **pill nav** that carries the Primer mark as a hero-level signal.',
-                        'InteractiveDotField atmosphere behind the hero — motion that adds presence without competing with the search CTA.',
-                        'Typography and spacing tokens keep the homepage, pricing, use cases, and legal pages in one visual language.',
+                        'Defined a light grain stage, floating **pill nav**, Primer mark, and motion that adds presence without stealing the search CTA.',
+                        'Kept pricing, use cases, insights, and legal in one visual family so the marketing surface reads as one product.',
+                        'Implemented shared **design tokens** and chrome (`library/tokens`, Nav, Footer, InteractiveDotField) reused by every route.',
                     ],
                 },
                 {
-                    title: 'Engineering Architecture',
+                    title: 'Marketing-Site Architecture',
                     items: [
-                        'Framer-style hierarchy: **Page → Section → Area → Frame → Component**, documented so new bands land in the right folder.',
-                        'Content collections + accessors separate copy from UI — pricing, use cases, and posts stay editable without rewriting sections.',
-                        'Vite + React Router app with Vercel serverless endpoints for contact, public config, and the **passcode /access gate**.',
+                        'Gave each page a single job — convert, explain, gate, or legal — so IA stayed scannable as the surface grew.',
+                        'Structured the codebase as **Page → Section → Area → Frame → Component** so new bands land in a predictable tree.',
+                        'Shipped content collections/accessors, React Router routes, and Vercel **api/** endpoints for contact, public config, and the passcode access gate.',
                     ],
                 },
             ],
             challengesAndSolutions: [
                 {
-                    problem: 'The marketing site had to feel like the product without embedding the full app.',
+                    problem:
+                        'The site had to feel like the product without shipping the full app in the marketing bundle.',
                     solution:
-                        'Built a dashboard mock under the hero and a sticky product-flow band using real UI captures — visitors see parcel maps, zoning layers, and report surfaces without loading the platform.',
+                        'Designed a dashboard mock and sticky product-flow band, then composed them in the page tree with real UI assets — product presence without embedding the SPA.',
                 },
                 {
-                    problem: 'Multi-page marketing without a CMS still needed editable, consistent copy.',
+                    problem: 'Multi-page marketing without a CMS still needed consistent, editable copy.',
                     solution:
-                        'Introduced content collections and accessors for pricing, use cases, blog posts, and legal pages so sections stay dumb and content stays centralized.',
+                        'Kept sections presentational and moved copy into content collections with accessors for pricing, use cases, posts, and legal — editable data, dumb UI.',
                 },
                 {
-                    problem: 'Early access required blocking the live platform behind a gate.',
+                    problem: 'Early access required without exposing the live platform on public CTAs.',
                     solution:
-                        'Routed login and trial CTAs through a passcode /access page backed by a serverless gate, keeping the marketing surface public and the product private.',
+                        'Routed login and free-trial CTAs to `/access` and backed the passcode check with a serverless gate so marketing stays public and the product stays private.',
                 },
                 {
-                    problem: 'Every statistic on use-case pages had to be real — no invented marketing numbers.',
+                    problem: 'Every public statistic had to be real — no invented marketing numbers.',
                     solution:
-                        'Constrained design and copy to verified product facts (avg 58s, 3,142 counties) and labelled market figures, so the visual system never outran the data.',
+                        'Constrained design and use-case content to verified product facts in the content data (avg 58s, 3,142 counties) and labelled market figures explicitly.',
                 },
             ],
         },

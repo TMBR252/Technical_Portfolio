@@ -199,9 +199,9 @@
             "completed": "Completed"
         },
         "sections": {
-            "missionBrief": "Mission Brief",
-            "keyFeatures": "Key Features",
-            "engineeringChronicles": "Engineering Chronicles",
+            "missionBrief": "Context",
+            "keyFeatures": "Decisions",
+            "engineeringChronicles": "Constraints",
             "visualGallery": "Visual Gallery",
             "installation": "Installation Instructions",
             "projectAccess": "Project Access",
