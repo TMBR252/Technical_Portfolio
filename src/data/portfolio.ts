@@ -39,6 +39,86 @@ export const portfolioData: PortfolioData = {
     },
     projects: [
         {
+            id: 'primer-landing-page',
+            slug: 'primer-landing-page',
+            title: 'Primer',
+            description:
+                'The landing page for Primer, the Primitive product — an address in, a feasibility answer out, in under a minute.',
+            longDescription:
+                'Designed and built primer.city, the marketing surface for Primer, the Primitive product. The page leads with the product itself rather than a description of it: a live address search sits directly in the hero, so the first interaction a visitor has is the same one the product is built around — type a property address, get a feasibility read back. Supporting proof is carried by the interface rather than by copy, with live parcel coverage, county count, and median run time surfaced as running system state beneath the search field. Owned both the visual system and the Vite/React architecture across pricing, use cases, insights, contact, and early access.',
+            techStack: ['Vite', 'React', 'React Router', 'Mapbox GL', 'CSS Design Tokens', 'Vercel'],
+            tools: ['Figma', 'Cursor', 'Claude Code'],
+            status: 'ongoing',
+            startDate: '2026-01-01',
+            role: 'Product & Design Lead',
+            customTimeline: '2026 — Present',
+            team: 'Founder',
+            category: 'Design Engineering',
+            demoUrl: 'https://primer.city',
+            highlights: [
+                'Avg 58s feasibility reports',
+                '3,142 counties of live parcel data',
+                'Page → Section → Area → Frame architecture',
+                'Passcode-gated early access before the platform',
+            ],
+            features: [
+                {
+                    title: 'Product-First Hero',
+                    items: [
+                        'Put the working address search in the hero so the first interaction is the product, not a form.',
+                        'Anchored the headline on the promise the product is measured against — **a feasibility answer in under a minute**.',
+                        'Framed pre-filled example properties as real results, each carrying its unit count and uIRR, so the value is legible before a visitor types anything.',
+                    ],
+                },
+                {
+                    title: 'Proof Through Interface',
+                    items: [
+                        'Surfaced live parcel coverage, county count, and median run time under the search field as running system state.',
+                        'Let product surfaces — property detail, parcel map, saved sets — do the explaining in place of feature copy.',
+                        'Sticky product-flow showcase walks site search → zoning → map layers → capacity → comps → export.',
+                    ],
+                },
+                {
+                    title: 'Visual System & Brand',
+                    items: [
+                        'Light gray grain stage with black accent chips and a floating **pill nav** that carries the Primer mark as a hero-level signal.',
+                        'InteractiveDotField atmosphere behind the hero — motion that adds presence without competing with the search CTA.',
+                        'Typography and spacing tokens keep the homepage, pricing, use cases, and legal pages in one visual language.',
+                    ],
+                },
+                {
+                    title: 'Engineering Architecture',
+                    items: [
+                        'Framer-style hierarchy: **Page → Section → Area → Frame → Component**, documented so new bands land in the right folder.',
+                        'Content collections + accessors separate copy from UI — pricing, use cases, and posts stay editable without rewriting sections.',
+                        'Vite + React Router app with Vercel serverless endpoints for contact, public config, and the **passcode /access gate**.',
+                    ],
+                },
+            ],
+            challengesAndSolutions: [
+                {
+                    problem: 'The marketing site had to feel like the product without embedding the full app.',
+                    solution:
+                        'Built a dashboard mock under the hero and a sticky product-flow band using real UI captures — visitors see parcel maps, zoning layers, and report surfaces without loading the platform.',
+                },
+                {
+                    problem: 'Multi-page marketing without a CMS still needed editable, consistent copy.',
+                    solution:
+                        'Introduced content collections and accessors for pricing, use cases, blog posts, and legal pages so sections stay dumb and content stays centralized.',
+                },
+                {
+                    problem: 'Early access required blocking the live platform behind a gate.',
+                    solution:
+                        'Routed login and trial CTAs through a passcode /access page backed by a serverless gate, keeping the marketing surface public and the product private.',
+                },
+                {
+                    problem: 'Every statistic on use-case pages had to be real — no invented marketing numbers.',
+                    solution:
+                        'Constrained design and copy to verified product facts (avg 58s, 3,142 counties) and labelled market figures, so the visual system never outran the data.',
+                },
+            ],
+        },
+        {
             id: 'primitive-ai',
             slug: 'primitive-ai-spatial-platform',
             title: 'Primitive AI',
@@ -80,47 +160,6 @@ export const portfolioData: PortfolioData = {
                     items: [
                         'Managed direct relationships with enterprise development teams, translating zoning, feasibility, and land-use judgment into programmable system requirements.',
                         'Ran an evaluation loop through direct client feedback: tested outputs against real deals, caught regressions, and refined logic before it reached developer decision-makers.',
-                    ],
-                },
-            ],
-        },
-        {
-            id: 'primer-landing',
-            slug: 'primer-landing-page',
-            title: 'Primer',
-            description:
-                'The landing page for Primer, the Primitive product — an address in, a feasibility answer out, in under a minute.',
-            longDescription:
-                'Designed and built primer.city, the marketing surface for Primer, the Primitive product. The page leads with the product itself rather than a description of it: a live address search sits directly in the hero, so the first interaction a visitor has is the same one the product is built around — type a property address, get a feasibility read back. Supporting proof is carried by the interface rather than by copy, with live parcel coverage, county count, and median run time surfaced as running system state beneath the search field.',
-            image: '/project/primer1.webp',
-            techStack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Vercel'],
-            tools: ['Figma', 'Cursor', 'Claude Code'],
-            status: 'ongoing',
-            startDate: '2026-01-01',
-            role: 'Product & Design Lead',
-            customTimeline: '2026 — Present',
-            team: 'Founder',
-            category: 'AI & Automation',
-            demoUrl: 'https://primer.city',
-            highlights: [
-                'Live address search in the hero, not a signup gate',
-                'Coverage and run-time surfaced as live system state',
-                'Worked example results carried as one-tap entry points',
-            ],
-            features: [
-                {
-                    title: 'Product-First Hero',
-                    items: [
-                        'Put the working address search in the hero so the first interaction is the product, not a form.',
-                        'Anchored the headline on the promise the product is measured against — **a feasibility answer in under a minute**.',
-                        'Framed pre-filled example properties as real results, each carrying its unit count and uIRR, so the value is legible before a visitor types anything.',
-                    ],
-                },
-                {
-                    title: 'Proof Through Interface',
-                    items: [
-                        'Surfaced live parcel coverage, county count, and median run time under the search field as running system state.',
-                        'Let product surfaces — property detail, parcel map, saved sets — do the explaining in place of feature copy.',
                     ],
                 },
             ],

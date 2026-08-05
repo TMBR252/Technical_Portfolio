@@ -22,11 +22,16 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
     // Fetch dynamic images from public/project folder
     const galleryImages = await getProjectImages(slug, project.title);
 
-    // If dynamic images found, override the project data
+    // First image = hero; remaining images = gallery (avoid duplicating the hero shot)
     const updatedProject = {
         ...project,
-        image: galleryImages.length > 0 ? galleryImages[0] : project.image, // First image as Hero
-        galleryImages: galleryImages.length > 0 ? galleryImages : project.galleryImages // All images for gallery
+        image: galleryImages.length > 0 ? galleryImages[0] : project.image,
+        galleryImages:
+            galleryImages.length > 1
+                ? galleryImages.slice(1)
+                : galleryImages.length === 0
+                  ? project.galleryImages
+                  : [],
     };
 
     return <ProjectPageContent project={updatedProject} />;

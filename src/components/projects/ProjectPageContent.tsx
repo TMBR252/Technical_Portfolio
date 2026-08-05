@@ -3,11 +3,11 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { X, Calendar, Code, Box, Award, Share2, ExternalLink, Github, Terminal, ChevronRight, ChevronLeft, CheckCircle2, Copy, Check, Maximize2, ArrowUpRight, Zap, Sparkles, ArrowLeft, Clock, Users, Layers, LayoutGrid, ArrowRight } from 'lucide-react';
+import { X, Code, Box, ExternalLink, Github, Terminal, ChevronRight, ChevronLeft, Copy, Check, Zap, Sparkles, ArrowLeft, Clock, Users, Layers, LayoutGrid } from 'lucide-react';
 import { cn, formatDate } from '@/lib/utils';
 import { Project } from '@/types';
-import { TechStack } from './TechStack';
 import { ProjectPlaceholder } from './ProjectPlaceholder';
+import { BrowserMockup } from './BrowserMockup';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { portfolioData } from '@/data/portfolio';
@@ -69,49 +69,42 @@ const renderRichText = (text: string) => {
     });
 };
 
-// --- Vertical Gallery Component ---
+// --- Vertical Gallery Component (browser mockup frames) ---
 const ProjectGallery = ({
     images,
     onImageClick,
     viewMoreText,
-    viewLessText
+    viewLessText,
+    mockupUrl,
 }: {
-    images: string[],
-    onImageClick: (img: string) => void,
-    viewMoreText: string,
-    viewLessText: string
+    images: string[];
+    onImageClick: (img: string) => void;
+    viewMoreText: string;
+    viewLessText: string;
+    mockupUrl?: string;
 }) => {
     const [showAll, setShowAll] = useState(false);
     const visibleImages = showAll ? images : images.slice(0, 2);
 
     return (
         <div className="flex flex-col gap-8 pb-12">
-            <div className="flex flex-col gap-12">
+            <div className="flex flex-col gap-10">
                 {visibleImages.map((img, idx) => (
                     <motion.div
                         key={idx}
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-10%" }}
+                        viewport={{ once: true, margin: '-10%' }}
                         transition={{ duration: 0.6, delay: idx * 0.1 }}
-                        className="group relative w-full cursor-zoom-in"
-                        onClick={() => onImageClick(img)}
                     >
-                        {/* Real Image Tag - Floating with deep shadow */}
-                        <img
-                            src={img}
-                            alt={`Gallery Image ${idx + 1}`}
-                            loading="lazy"
-                            className="w-full h-auto object-contain block rounded-lg shadow-2xl shadow-black/20 dark:shadow-black/60 transition-transform duration-500 group-hover:scale-[1.01]"
-                        />
-
-                        {/* Tech UI (Minimal Floating Label) */}
-                        <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                            <div className="bg-white/90 dark:bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-black/10 dark:border-white/10 text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400 shadow-lg flex items-center gap-2">
-                                <span>IMG_0{idx + 1}</span>
-                                <Maximize2 className="w-3 h-3" />
-                            </div>
-                        </div>
+                        <BrowserMockup url={mockupUrl} onClick={() => onImageClick(img)}>
+                            <img
+                                src={img}
+                                alt={`Gallery Image ${idx + 1}`}
+                                loading="lazy"
+                                className="block h-auto w-full object-cover object-top"
+                            />
+                        </BrowserMockup>
                     </motion.div>
                 ))}
             </div>
@@ -123,7 +116,7 @@ const ProjectGallery = ({
                         className="px-6 py-3 rounded-full border border-border/40 hover:bg-secondary/10 transition-colors text-sm font-bold tracking-wide uppercase flex items-center gap-2 group"
                     >
                         <span>{showAll ? viewLessText : viewMoreText}</span>
-                        <ChevronRight className={cn("w-4 h-4 transition-transform duration-300", showAll ? "rotate-[-90deg]" : "rotate-90")} />
+                        <ChevronRight className={cn('w-4 h-4 transition-transform duration-300', showAll ? 'rotate-[-90deg]' : 'rotate-90')} />
                     </button>
                 </div>
             )}
@@ -243,32 +236,37 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                 </motion.div>
             </div>
 
-            {/* 2. HERO IMAGE SECTION (Wide Banner) */}
+            {/* 2. HERO IMAGE SECTION (Dribbble-style browser mockup) */}
             <div className="container max-w-7xl mx-auto px-6 mb-16">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.7, delay: 0.2 }}
-                    className="relative w-full aspect-video md:aspect-[2/1] rounded-3xl overflow-hidden border border-black/15 dark:border-border/40 shadow-2xl bg-secondary/5 group"
-                    onClick={() => project.image && setSelectedImage(project.image)}
                 >
                     {project.image ? (
-                        <motion.img
-                            src={project.image}
-                            alt={project.title}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 cursor-zoom-in"
-                        />
+                        <BrowserMockup
+                            url={project.demoUrl ? project.demoUrl.replace(/^https?:\/\//, '') : `${project.title.toLowerCase()}.app`}
+                            onClick={() => setSelectedImage(project.image!)}
+                        >
+                            <img
+                                src={project.image}
+                                alt={project.title}
+                                className="block h-auto w-full object-cover object-top"
+                            />
+                        </BrowserMockup>
                     ) : (
-                        <ProjectPlaceholder className="rounded-none border-0 bg-transparent pb-0 [&>div.z-10]:scale-125" title={project.title} />
+                        <div className="relative w-full aspect-video md:aspect-[2/1] overflow-hidden rounded-3xl border border-black/15 bg-secondary/5 shadow-2xl dark:border-border/40">
+                            <ProjectPlaceholder className="rounded-none border-0 bg-transparent pb-0 [&>div.z-10]:scale-125" title={project.title} />
+                        </div>
                     )}
-
-                    {/* Overlay Gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
                 </motion.div>
             </div>
 
             {/* 3. METADATA BAR (Horizontal Strip) */}
-            <div className="container max-w-7xl mx-auto px-6 mb-20">
+            <div className={cn(
+                'container max-w-7xl mx-auto px-6',
+                project.highlights && project.highlights.length > 0 ? 'mb-8' : 'mb-20'
+            )}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-4 border-y border-black/20 dark:border-border/40 py-8">
                     <div className="flex flex-col gap-2">
                         <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold flex items-center gap-2">
@@ -296,6 +294,23 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                     </div>
                 </div>
             </div>
+
+            {/* 3b. HIGHLIGHTS PROOF STRIP */}
+            {project.highlights && project.highlights.length > 0 && (
+                <div className="container max-w-7xl mx-auto px-6 mb-20">
+                    <div className="flex flex-wrap gap-3">
+                        {project.highlights.map((item) => (
+                            <span
+                                key={item}
+                                className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-secondary/10 px-4 py-2 text-sm font-medium text-foreground dark:border-white/10 dark:bg-secondary/5"
+                            >
+                                <Sparkles className="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                                {item}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* 4. MAIN CONTENT GRID */}
             <div className="container max-w-7xl mx-auto px-6">
@@ -393,6 +408,11 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                                     onImageClick={(img) => setSelectedImage(img)}
                                     viewMoreText={t('sections.viewMore')}
                                     viewLessText={t('sections.viewLess')}
+                                    mockupUrl={
+                                        project.demoUrl
+                                            ? project.demoUrl.replace(/^https?:\/\//, '')
+                                            : `${project.title.toLowerCase()}.app`
+                                    }
                                 />
                             </section>
                         )}
