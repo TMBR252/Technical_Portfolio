@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useRef, type MouseEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { X, Box, ExternalLink, Github, Terminal, ChevronRight, ChevronLeft, Copy, Check, Zap, Sparkles, ArrowLeft, LayoutGrid } from 'lucide-react';
+import { X, Code, Box, ExternalLink, Github, Terminal, ChevronRight, ChevronLeft, Copy, Check, Zap, Sparkles, ArrowLeft, Clock, Users, Layers, LayoutGrid } from 'lucide-react';
 import { cn, formatDate } from '@/lib/utils';
 import { Project } from '@/types';
 import { ProjectPlaceholder } from './ProjectPlaceholder';
@@ -451,46 +451,35 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                 </motion.div>
             </div>
 
-            {/* 3. ROLE / TIMELINE / TECH */}
+            {/* 3. METADATA BAR (Horizontal Strip) */}
             <div className={cn(
                 'container max-w-7xl mx-auto px-6',
                 project.highlights && project.highlights.length > 0 ? 'mb-8' : 'mb-20'
             )}>
-                <div className="border-y border-black/20 dark:border-border/40 py-10 space-y-10">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
-                        <div className="flex flex-col gap-2 max-w-xl">
-                            <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
-                                {t('metadata.role')}
-                            </span>
-                            <span className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-                                {project.role || t('metadata.roleValue')}
-                            </span>
-                            {project.roleDescription && (
-                                <p className="text-sm md:text-base text-muted-foreground leading-relaxed mt-1">
-                                    {project.roleDescription}
-                                </p>
-                            )}
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
-                                {t('metadata.timeline')}
-                            </span>
-                            <span className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-                                {project.customTimeline || formatDate(project.startDate)}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col gap-3">
-                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
-                            {t('metadata.techStack')}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-4 border-y border-black/20 dark:border-border/40 py-8">
+                    <div className="flex flex-col gap-2">
+                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold flex items-center gap-2">
+                            <Code className="w-3 h-3" /> {t('metadata.role')}
                         </span>
-                        <p className={cn(
-                            'text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight leading-[1.25]',
-                            brand.text
-                        )}>
-                            {project.techStack.join(', ')}
-                        </p>
+                        <span className="font-bold text-foreground">{project.role || t('metadata.roleValue')}</span>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold flex items-center gap-2">
+                            <Clock className="w-3 h-3" /> {t('metadata.timeline')}
+                        </span>
+                        <span className="font-bold text-foreground">{project.customTimeline || formatDate(project.startDate)}</span>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold flex items-center gap-2">
+                            <Users className="w-3 h-3" /> {t('metadata.team')}
+                        </span>
+                        <span className="font-bold text-foreground">{project.team || t('metadata.teamValue')}</span>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold flex items-center gap-2">
+                            <Layers className="w-3 h-3" /> {t('metadata.techStack')}
+                        </span>
+                        <span className="font-bold text-foreground truncate">{t('metadata.techStackValue', { count: project.techStack.length })}</span>
                     </div>
                 </div>
             </div>
