@@ -5,14 +5,19 @@
  *
  * Tailwind maps these to utilities:
  *   Brand   → text-brand, bg-brand/10, border-brand, to-brand-deep
- *   Fonts   → font-sans, font-mono, font-display, font-hand
+ *   Fonts   → font-sans / font-mono / font-display / font-hand
+ *             (wired in tailwind.config.ts → next/font vars from layout.tsx)
  *   Type    → text-display-xl, text-display, text-title, text-body-lg
- *   Radius  → rounded-lg / rounded-xl / rounded-2xl / rounded-3xl
+ *   Radius  → rounded-lg (+ rounded-token-xl / 2xl / 3xl for token sizes)
  *   Shadow  → shadow-brand-sm, shadow-brand-md, shadow-brand-lg
  *
  * Semantic surfaces (background, muted, border) live in globals.css :root / .dark
  * Layout breakpoints live in src/lib/breakpoints.ts
  * JS-facing constants mirror this file in src/lib/design-tokens.ts
+ *
+ * Font faces: edit loaders in src/app/layout.tsx (--font-inter, --font-jetbrains,
+ * --font-playfair, --font-signature). Do not nest those vars inside other CSS
+ * font stacks — next/font variables must be referenced directly by Tailwind.
  * =============================================================================
  */
 
@@ -24,13 +29,7 @@
   --brand-foreground-rgb: 17 17 17;
   --brand-deep-rgb: 123 168 46;
 
-  /* --- Font stacks (faces loaded in src/app/layout.tsx via next/font) ----- */
-  --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
-  --font-display: var(--font-playfair), Georgia, 'Times New Roman', serif;
-  --font-hand: var(--font-signature), 'Segoe Script', cursive;
-
-  /* --- Type scale (line-height + letter-spacing baked in via Tailwind) ---- */
+  /* --- Type scale (opt-in utilities; does not override text-sm/base/xl) --- */
   --text-display-xl: clamp(2.75rem, 6vw, 4.5rem);
   --text-display: clamp(2rem, 4vw, 3rem);
   --text-title: clamp(1.5rem, 2.5vw, 2rem);

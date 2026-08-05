@@ -448,11 +448,11 @@
   }
 
   .font-serif-elegant {
-    @apply font-display;
+    font-family: var(--font-playfair), Georgia, 'Times New Roman', serif;
   }
 
   .font-signature {
-    @apply font-hand;
+    font-family: var(--font-signature), 'Segoe Script', cursive;
   }
 }
 

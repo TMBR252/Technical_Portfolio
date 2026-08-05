@@ -6,7 +6,7 @@ import { ThemeProvider, I18nProvider, SmoothScrollProvider } from '@/providers';
 /** Design tokens (brand, type, radius) → src/styles/tokens.css — see README */
 import '@/styles/globals.css';
 
-/** Face loaders — stacks composed in tokens.css (--font-sans / mono / display / hand) */
+/** Face loaders — CSS vars referenced by Tailwind fontFamily in tailwind.config.ts */
 const inter = Inter({
     subsets: ['latin'],
     variable: '--font-inter',

@@ -110,10 +110,11 @@ const config: Config = {
 				}
 			},
 			fontFamily: {
-				sans: ['var(--font-sans)'],
-				mono: ['var(--font-mono)'],
-				display: ['var(--font-display)'],
-				hand: ['var(--font-hand)'],
+				// Point at next/font variables from layout.tsx — do not nest stacks in CSS vars
+				sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+				mono: ['var(--font-jetbrains)', 'ui-monospace', 'monospace'],
+				display: ['var(--font-playfair)', 'Georgia', 'Times New Roman', 'serif'],
+				hand: ['var(--font-signature)', 'Segoe Script', 'cursive'],
 			},
 			fontSize: {
 				'display-xl': [
@@ -281,9 +282,10 @@ const config: Config = {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)',
-				xl: 'var(--radius-xl)',
-				'2xl': 'var(--radius-2xl)',
-				'3xl': 'var(--radius-3xl)',
+				// Keep Tailwind defaults for xl/2xl/3xl — only expose token aliases as extras
+				'token-xl': 'var(--radius-xl)',
+				'token-2xl': 'var(--radius-2xl)',
+				'token-3xl': 'var(--radius-3xl)',
 			}
 		}
 	},

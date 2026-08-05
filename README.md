@@ -19,11 +19,11 @@ Almost all visual identity lives in tokens — change these first, not random co
 
 **Rebrand accent color** — update `--brand`, `--brand-rgb`, and optionally `--brand-deep*` in `tokens.css`.
 
-**Swap body font** — change the `Inter` import in `layout.tsx` and keep `--font-inter` (or rename both the variable and `tokens.css` stacks together).
+**Swap body font** — change the `Inter` (or other) loader in `layout.tsx`; keep the same CSS variable name (`--font-inter`, etc.) that Tailwind references in `tailwind.config.ts`.
 
-**Type roles** — use `text-display-xl`, `text-display`, `text-title`, `text-body-lg` instead of one-off clamps where possible.
+**Type roles** — opt-in: `text-display-xl`, `text-display`, `text-title`, `text-body-lg` (does not change default `text-sm` / `text-xl`).
 
-**Radius** — prefer `rounded-xl` / `rounded-2xl` / `rounded-3xl` (wired to tokens) over magic `rounded-[1.7rem]`.
+**Radius** — `rounded-lg` uses `--radius`. Extra token sizes: `rounded-token-xl` / `rounded-token-2xl` / `rounded-token-3xl`.
 
 ## Develop
 

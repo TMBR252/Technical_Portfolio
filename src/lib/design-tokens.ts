@@ -16,16 +16,16 @@ export const brand = {
 } as const;
 
 export const fonts = {
-    /** CSS variable names set by next/font in layout.tsx */
+    /** CSS variable names set by next/font in layout.tsx — use these directly */
     interVar: '--font-inter',
     jetbrainsVar: '--font-jetbrains',
     playfairVar: '--font-playfair',
     signatureVar: '--font-signature',
-    /** Stacks from tokens.css */
-    sans: 'var(--font-sans)',
-    mono: 'var(--font-mono)',
-    display: 'var(--font-display)',
-    hand: 'var(--font-hand)',
+    /** Tailwind / CSS usage */
+    sans: 'var(--font-inter), system-ui, sans-serif',
+    mono: 'var(--font-jetbrains), ui-monospace, monospace',
+    display: "var(--font-playfair), Georgia, 'Times New Roman', serif",
+    hand: "var(--font-signature), 'Segoe Script', cursive",
 } as const;
 
 export const typeRoles = {
