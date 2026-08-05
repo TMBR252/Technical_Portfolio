@@ -12,6 +12,18 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { portfolioData } from '@/data/portfolio';
 
+/** Site brand lime — matches Navbar / IdentitySequence accents */
+const brand = {
+    text: 'text-[#D1FF4D]',
+    textMuted: 'text-[#D1FF4D]/80',
+    bgSoft: 'bg-[#D1FF4D]/10',
+    bgDot: 'bg-[#D1FF4D]',
+    borderSoft: 'border-[#D1FF4D]/30',
+    iconBox: 'bg-[#D1FF4D]/10 text-[#D1FF4D]',
+    hoverBorder: 'group-hover:border-[#D1FF4D]',
+    hoverText: 'group-hover:text-[#D1FF4D]',
+} as const;
+
 // --- Animated Terminal Component ---
 const TerminalBlock = ({ title, code }: { title: string; code: string }) => {
     const [copied, setCopied] = useState(false);
@@ -29,7 +41,7 @@ const TerminalBlock = ({ title, code }: { title: string; code: string }) => {
                 <div className="flex gap-1.5">
                     <div className="w-3 h-3 rounded-full bg-red-500/80" />
                     <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                    <div className="w-3 h-3 rounded-full bg-green-500/80" />
+                    <div className={cn('w-3 h-3 rounded-full', brand.bgDot, 'opacity-80')} />
                 </div>
                 <span className="text-xs font-mono text-slate-500 dark:text-white/30">{title}</span>
                 <div className="w-10" /> {/* Spacer for balance */}
@@ -42,14 +54,14 @@ const TerminalBlock = ({ title, code }: { title: string; code: string }) => {
                         onClick={handleCopy}
                         className="p-1.5 rounded-md bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-slate-500 dark:text-white/50 hover:text-black dark:hover:text-white transition-all focus:outline-none"
                     >
-                        {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copied ? <Check className={cn('w-3.5 h-3.5', brand.text)} /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
                 </div>
                 <div className="font-mono text-sm leading-relaxed overflow-x-auto">
                     {code.split('\n').map((line, i) => (
                         <div key={i} className="flex min-w-max">
                             <span className="text-slate-400 dark:text-white/20 mr-4 select-none">$</span>
-                            <span className="text-emerald-700 dark:text-emerald-400">{line}</span>
+                            <span className={brand.text}>{line}</span>
                         </div>
                     ))}
                 </div>
@@ -63,7 +75,7 @@ const renderRichText = (text: string) => {
     const parts = text.split(/(\*\*.*?\*\*)/g);
     return parts.map((part, i) => {
         if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={i} className="font-bold text-foreground bg-primary/10 px-1 rounded mx-0.5">{part.slice(2, -2)}</strong>;
+            return <strong key={i} className={cn('font-bold px-1 rounded mx-0.5', brand.text, brand.bgSoft)}>{part.slice(2, -2)}</strong>;
         }
         return <span key={i}>{part}</span>;
     });
@@ -156,7 +168,7 @@ const Typewriter = ({ examples }: { examples: string[] }) => {
     }, [currentText, isDeleting, loopNum, examples]);
 
     return (
-        <span className="font-mono text-emerald-400">
+        <span className={cn('font-mono', brand.text)}>
             {currentText}
             <span className="animate-pulse">|</span>
         </span>
@@ -211,7 +223,7 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                     <div className="w-full">
                         {/* Status Badge */}
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-6 border bg-secondary/10 dark:bg-secondary/5 border-black/20 dark:border-border/40 text-muted-foreground">
-                            <span className={cn("w-2 h-2 rounded-full", isOngoing ? "bg-emerald-500 animate-pulse" : "bg-blue-500")} />
+                            <span className={cn('w-2 h-2 rounded-full', brand.bgDot, isOngoing ? 'animate-pulse' : 'opacity-60')} />
                             {isOngoing ? t('status.ongoing') : t('status.completed')}
                         </div>
 
@@ -225,7 +237,7 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                         </p>
 
                         {/* Typewriter Effect (Subtext) */}
-                        <div className="font-mono text-sm text-emerald-500/80 mb-8 h-6 flex items-center">
+                        <div className={cn('font-mono text-sm mb-8 h-6 flex items-center', brand.textMuted)}>
                             <Typewriter examples={[
                                 "Initiating project overview...",
                                 "Loading technical specifications...",
@@ -304,7 +316,7 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                                 key={item}
                                 className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-secondary/10 px-4 py-2 text-sm font-medium text-foreground dark:border-white/10 dark:bg-secondary/5"
                             >
-                                <Sparkles className="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                                <Sparkles className={cn('h-3.5 w-3.5 shrink-0', brand.text)} />
                                 {item}
                             </span>
                         ))}
@@ -322,12 +334,12 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                         {/* MISSION OVERVIEW */}
                         <section id="mission">
                             <div className="flex items-center gap-3 mb-6">
-                                <span className="bg-emerald-500/10 text-emerald-500 p-2 rounded-lg">
+                                <span className={cn('p-2 rounded-lg', brand.iconBox)}>
                                     <Box className="w-5 h-5" />
                                 </span>
                                 <h2 className="text-2xl font-bold text-foreground">{t('sections.missionBrief')}</h2>
                             </div>
-                            <div className="prose prose-lg dark:prose-invert prose-emerald max-w-none prose-headings:font-black prose-headings:tracking-tight prose-p:leading-loose text-zinc-600 dark:text-muted-foreground">
+                            <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-black prose-headings:tracking-tight prose-p:leading-loose text-zinc-600 dark:text-muted-foreground">
                                 <p>{project.longDescription || project.description}</p>
                             </div>
                         </section>
@@ -336,7 +348,7 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                         {project.features && (
                             <section id="features">
                                 <div className="flex items-center gap-3 mb-8">
-                                    <span className="bg-blue-500/10 text-blue-500 p-2 rounded-lg">
+                                    <span className={cn('p-2 rounded-lg', brand.iconBox)}>
                                         <Zap className="w-5 h-5" />
                                     </span>
                                     <h2 className="text-2xl font-bold text-foreground">{t('sections.keyFeatures')}</h2>
@@ -350,14 +362,14 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                                             viewport={{ once: true }}
                                             className="p-6 rounded-2xl bg-secondary/10 dark:bg-secondary/5 border border-black/25 dark:border-white/5 hover:border-black/35 dark:hover:border-white/10 transition-colors shadow-sm dark:shadow-none"
                                         >
-                                            <div className="w-10 h-10 rounded-xl bg-black/10 dark:bg-white/5 flex items-center justify-center mb-4 text-emerald-700 dark:text-emerald-500">
+                                            <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center mb-4', brand.iconBox)}>
                                                 {idx === 0 ? <Box className="w-5 h-5" /> : idx === 1 ? <Terminal className="w-5 h-5" /> : idx === 2 ? <Zap className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
                                             </div>
                                             <h3 className="text-lg font-bold text-foreground mb-3">{group.title}</h3>
                                             <ul className="space-y-2">
                                                 {group.items.map((item, i) => (
                                                     <li key={i} className="text-sm text-muted-foreground flex gap-2 items-start">
-                                                        <span className="mt-1.5 w-1 h-1 rounded-full bg-emerald-500 shrink-0" />
+                                                        <span className={cn('mt-1.5 w-1 h-1 rounded-full shrink-0', brand.bgDot)} />
                                                         <span>{renderRichText(item)}</span>
                                                     </li>
                                                 ))}
@@ -372,7 +384,7 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                         {project.challengesAndSolutions && (
                             <section id="chronicles">
                                 <div className="flex items-center gap-3 mb-8">
-                                    <span className="bg-amber-500/10 text-amber-500 p-2 rounded-lg">
+                                    <span className={cn('p-2 rounded-lg', brand.iconBox)}>
                                         <Terminal className="w-5 h-5" />
                                     </span>
                                     <h2 className="text-2xl font-bold text-foreground">{t('sections.engineeringChronicles')}</h2>
@@ -380,12 +392,12 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                                 <div className="relative border-l border-black/40 dark:border-white/10 ml-3 space-y-12 pl-8 pb-4">
                                     {project.challengesAndSolutions.map((item, idx) => (
                                         <div key={idx} className="relative group">
-                                            <div className="absolute -left-[37px] top-1 w-4 h-4 rounded-full bg-background border-2 border-black/40 dark:border-white/10 group-hover:border-amber-500 transition-colors z-10" />
-                                            <h4 className="text-lg font-bold text-foreground mb-2 group-hover:text-amber-500 transition-colors">
+                                            <div className={cn('absolute -left-[37px] top-1 w-4 h-4 rounded-full bg-background border-2 border-black/40 dark:border-white/10 transition-colors z-10', brand.hoverBorder)} />
+                                            <h4 className={cn('text-lg font-bold text-foreground mb-2 transition-colors', brand.hoverText)}>
                                                 {item.problem}
                                             </h4>
                                             <div className="text-sm text-zinc-600 dark:text-muted-foreground pl-4 border-l border-black/30 dark:border-white/5">
-                                                <span className="text-emerald-700 dark:text-emerald-500 font-bold text-xs uppercase tracking-wider block mb-1">{t('sections.solution')}</span>
+                                                <span className={cn('font-bold text-xs uppercase tracking-wider block mb-1', brand.text)}>{t('sections.solution')}</span>
                                                 {item.solution}
                                             </div>
                                         </div>
@@ -398,7 +410,7 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                         {project.galleryImages && project.galleryImages.length > 0 && (
                             <section id="gallery">
                                 <div className="flex items-center gap-3 mb-8">
-                                    <span className="bg-purple-500/10 text-purple-500 p-2 rounded-lg">
+                                    <span className={cn('p-2 rounded-lg', brand.iconBox)}>
                                         <LayoutGrid className="w-5 h-5" />
                                     </span>
                                     <h2 className="text-2xl font-bold text-foreground">{t('sections.visualGallery')}</h2>
@@ -421,7 +433,7 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                         {project.installation && (
                             <section id="installation">
                                 <div className="flex items-center gap-3 mb-8">
-                                    <span className="bg-emerald-500/10 text-emerald-500 p-2 rounded-lg">
+                                    <span className={cn('p-2 rounded-lg', brand.iconBox)}>
                                         <Terminal className="w-5 h-5" />
                                     </span>
                                     <h2 className="text-2xl font-bold text-foreground">{t('sections.installation')}</h2>
@@ -437,7 +449,7 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                                             ) : (
                                                 <div className="bg-secondary/20 dark:bg-secondary/5 p-6 rounded-2xl border border-black/10 dark:border-white/5">
                                                     <h3 className="text-base font-bold text-foreground mb-3 flex items-center gap-2">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-700 dark:bg-emerald-500" />
+                                                        <span className={cn('w-1.5 h-1.5 rounded-full', brand.bgDot)} />
                                                         {step.title}
                                                     </h3>
                                                     <p className="text-sm text-muted-foreground leading-relaxed">
@@ -584,10 +596,11 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                                 <div className="absolute bottom-0 left-0 w-full p-5 flex flex-col justify-end">
                                     <div className="mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
                                         <span className={cn(
-                                            "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium backdrop-blur-md",
-                                            p.status === 'ongoing'
-                                                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                                                : "border-blue-500/30 bg-blue-500/10 text-blue-400"
+                                            'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium backdrop-blur-md',
+                                            brand.borderSoft,
+                                            brand.bgSoft,
+                                            brand.text,
+                                            p.status !== 'ongoing' && 'opacity-70'
                                         )}>
                                             {p.status === 'ongoing' ? 'In Progress' : 'Completed'}
                                         </span>
