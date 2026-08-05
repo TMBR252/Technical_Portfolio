@@ -1,5 +1,20 @@
 import React from 'react';
 
+/** Optional case-study scroll section — omit empty sections; order = page order */
+export interface CaseStudyBlock {
+    title: string;
+    body?: string;
+    image?: string;
+}
+
+export interface CaseStudySection {
+    id: string;
+    label: string;
+    body?: string;
+    blocks?: CaseStudyBlock[];
+    images?: string[];
+}
+
 export interface Project {
     id: string;
     slug: string;
@@ -17,8 +32,12 @@ export interface Project {
     highlights?: string[];
     challenges?: string[];
     category?: string;
+    /** Flexible case-study sections (preferred). When set, drives TOC + scroll column. */
+    caseStudy?: CaseStudySection[];
+    /** @deprecated Prefer caseStudy — kept for projects not yet migrated */
     features?: { title: string; items: string[] }[];
     installation?: { title: string; cmd?: string; code?: string; type: 'code' | 'text' }[];
+    /** @deprecated Prefer caseStudy */
     challengesAndSolutions?: { problem: string; solution: string }[];
     galleryImages?: string[];
     team?: string;

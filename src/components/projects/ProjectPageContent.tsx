@@ -7,10 +7,11 @@ import { X, Code, Box, ExternalLink, Github, Terminal, ChevronRight, ChevronLeft
 import { cn, formatDate } from '@/lib/utils';
 import { Project } from '@/types';
 import { ProjectPlaceholder } from './ProjectPlaceholder';
-import { BrowserMockup } from './BrowserMockup';
+import { ProjectMedia } from './ProjectMedia';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { portfolioData } from '@/data/portfolio';
+import type { CaseStudySection } from '@/types';
 
 /** Site brand lime — matches Navbar / IdentitySequence accents */
 const brand = {
@@ -86,12 +87,10 @@ const ProjectGalleryTeaser = ({
     image,
     imageCount,
     onOpen,
-    mockupUrl,
 }: {
     image: string;
     imageCount: number;
     onOpen: () => void;
-    mockupUrl?: string;
 }) => {
     return (
         <motion.div
@@ -101,20 +100,104 @@ const ProjectGalleryTeaser = ({
             transition={{ duration: 0.6 }}
             className="pb-4"
         >
-            <BrowserMockup url={mockupUrl} onClick={onOpen}>
+            <ProjectMedia onClick={onOpen}>
                 <img
                     src={image}
                     alt="Visual gallery preview"
                     loading="lazy"
                     className="block h-auto w-full object-cover object-top"
                 />
-            </BrowserMockup>
+            </ProjectMedia>
             {imageCount > 1 && (
                 <p className="mt-4 text-center text-sm text-muted-foreground">
                     Click to view all {imageCount} images
                 </p>
             )}
         </motion.div>
+    );
+};
+
+const CaseStudySectionView = ({
+    section,
+    onImageClick,
+}: {
+    section: CaseStudySection;
+    onImageClick: (src: string) => void;
+}) => {
+    const teaser = section.images?.[0];
+    const extraImages = section.images?.slice(1) ?? [];
+
+    return (
+        <section id={section.id}>
+            <div className="flex items-center gap-3 mb-6">
+                <span className={cn('p-2 rounded-lg', brand.iconBox)}>
+                    <Box className="w-5 h-5" />
+                </span>
+                <h2 className="text-2xl font-bold text-foreground">{section.label}</h2>
+            </div>
+
+            {section.body && (
+                <div className="prose prose-lg dark:prose-invert max-w-none prose-p:leading-loose text-zinc-600 dark:text-muted-foreground mb-8">
+                    <p>{renderRichText(section.body)}</p>
+                </div>
+            )}
+
+            {section.blocks && section.blocks.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    {section.blocks.map((block, idx) => (
+                        <motion.div
+                            key={`${section.id}-${idx}`}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="p-6 rounded-2xl bg-secondary/10 dark:bg-secondary/5 border border-black/25 dark:border-white/5 hover:border-black/35 dark:hover:border-white/10 transition-colors shadow-sm dark:shadow-none"
+                        >
+                            <h3 className="text-lg font-bold text-foreground mb-2">{block.title}</h3>
+                            {block.body && (
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                    {renderRichText(block.body)}
+                                </p>
+                            )}
+                            {block.image && (
+                                <div className="mt-4">
+                                    <ProjectMedia staged={false} onClick={() => onImageClick(block.image!)}>
+                                        <img
+                                            src={block.image}
+                                            alt={block.title}
+                                            loading="lazy"
+                                            className="block h-auto w-full object-cover object-top"
+                                        />
+                                    </ProjectMedia>
+                                </div>
+                            )}
+                        </motion.div>
+                    ))}
+                </div>
+            )}
+
+            {teaser && (
+                <ProjectGalleryTeaser
+                    image={teaser}
+                    imageCount={(section.images?.length ?? 0)}
+                    onOpen={() => onImageClick(teaser)}
+                />
+            )}
+
+            {extraImages.length > 0 && (
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {extraImages.map((img) => (
+                        <ProjectMedia key={img} staged={false} onClick={() => onImageClick(img)}>
+                            <img
+                                src={img}
+                                alt=""
+                                loading="lazy"
+                                className="block h-auto w-full object-cover object-top"
+                            />
+                        </ProjectMedia>
+                    ))}
+                </div>
+            )}
+        </section>
     );
 };
 
@@ -298,20 +381,33 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
     const router = useRouter();
     const isOngoing = project.status === 'ongoing';
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-    const [activeTocId, setActiveTocId] = useState('mission');
     const [hoveredTocId, setHoveredTocId] = useState<string | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const hasCaseStudy = Boolean(project.caseStudy?.length);
 
-    /** Hero first, then gallery shots (deduped) — one slideshow for the page */
+    /** Hero + case-study + gallery shots (deduped) — one slideshow for the page */
     const slideshowImages = useMemo(() => {
+        const fromCase = (project.caseStudy ?? []).flatMap((section) => [
+            ...(section.images ?? []),
+            ...((section.blocks?.map((b) => b.image).filter(Boolean) as string[]) ?? []),
+        ]);
         const gallery = project.galleryImages ?? [];
-        if (project.image && !gallery.includes(project.image)) {
-            return [project.image, ...gallery];
-        }
-        return gallery.length > 0 ? gallery : project.image ? [project.image] : [];
-    }, [project.image, project.galleryImages]);
+        const all = [project.image, ...fromCase, ...gallery].filter(Boolean) as string[];
+        return Array.from(new Set(all));
+    }, [project.image, project.galleryImages, project.caseStudy]);
 
     const tocItems = useMemo(() => {
+        if (hasCaseStudy) {
+            const items = project.caseStudy!.map((section) => ({
+                id: section.id,
+                label: section.label,
+            }));
+            if (project.installation) {
+                items.push({ id: 'installation', label: t('sections.installation') });
+            }
+            return items;
+        }
+
         const items: { id: string; label: string }[] = [
             { id: 'mission', label: t('sections.missionBrief') },
         ];
@@ -320,7 +416,22 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
         if (project.galleryImages?.length) items.push({ id: 'gallery', label: t('sections.visualGallery') });
         if (project.installation) items.push({ id: 'installation', label: t('sections.installation') });
         return items;
-    }, [project.features, project.challengesAndSolutions, project.galleryImages, project.installation, t]);
+    }, [
+        hasCaseStudy,
+        project.caseStudy,
+        project.features,
+        project.challengesAndSolutions,
+        project.galleryImages,
+        project.installation,
+        t,
+    ]);
+
+    const [activeTocId, setActiveTocId] = useState(tocItems[0]?.id ?? 'mission');
+
+    const firstTocId = tocItems[0]?.id ?? 'mission';
+    useEffect(() => {
+        setActiveTocId(firstTocId);
+    }, [project.id, firstTocId]);
 
     const highlightedTocId = hoveredTocId ?? activeTocId;
 
@@ -353,6 +464,11 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
     const openSlideshow = (index: number) => {
         if (slideshowImages.length === 0) return;
         setLightboxIndex(Math.max(0, Math.min(index, slideshowImages.length - 1)));
+    };
+
+    const openSlideshowAt = (src: string) => {
+        const index = slideshowImages.indexOf(src);
+        openSlideshow(index >= 0 ? index : 0);
     };
 
     const scrollToSection = (id: string) => {
@@ -425,7 +541,7 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                 </motion.div>
             </div>
 
-            {/* 2. HERO IMAGE SECTION (Dribbble-style browser mockup) */}
+            {/* 2. HERO IMAGE (chrome-free media) */}
             <div className="container max-w-7xl mx-auto px-6 mb-16">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.98 }}
@@ -433,16 +549,13 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                     transition={{ duration: 0.7, delay: 0.2 }}
                 >
                     {project.image ? (
-                        <BrowserMockup
-                            url={project.demoUrl ? project.demoUrl.replace(/^https?:\/\//, '') : `${project.title.toLowerCase()}.app`}
-                            onClick={() => openSlideshow(0)}
-                        >
+                        <ProjectMedia onClick={() => openSlideshow(0)}>
                             <img
                                 src={project.image}
                                 alt={project.title}
                                 className="block h-auto w-full object-cover object-top"
                             />
-                        </BrowserMockup>
+                        </ProjectMedia>
                     ) : (
                         <div className="relative w-full aspect-video md:aspect-[2/1] overflow-hidden rounded-3xl border border-black/15 bg-secondary/5 shadow-2xl dark:border-border/40">
                             <ProjectPlaceholder className="rounded-none border-0 bg-transparent pb-0 [&>div.z-10]:scale-125" title={project.title} />
@@ -508,109 +621,110 @@ export function ProjectPageContent({ project, isLowPowerMode }: { project: Proje
                     {/* LEFT COLUMN: Main Content (8 cols) */}
                     <div className="lg:col-span-8 space-y-20">
 
-                        {/* MISSION OVERVIEW */}
-                        <section id="mission">
-                            <div className="flex items-center gap-3 mb-6">
-                                <span className={cn('p-2 rounded-lg', brand.iconBox)}>
-                                    <Box className="w-5 h-5" />
-                                </span>
-                                <h2 className="text-2xl font-bold text-foreground">{t('sections.missionBrief')}</h2>
-                            </div>
-                            <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-black prose-headings:tracking-tight prose-p:leading-loose text-zinc-600 dark:text-muted-foreground">
-                                <p>{project.longDescription || project.description}</p>
-                            </div>
-                        </section>
+                        {hasCaseStudy ? (
+                            <>
+                                {project.caseStudy!.map((section) => (
+                                    <CaseStudySectionView
+                                        key={section.id}
+                                        section={section}
+                                        onImageClick={openSlideshowAt}
+                                    />
+                                ))}
+                            </>
+                        ) : (
+                            <>
+                                {/* LEGACY: mission / features / chronicles / gallery */}
+                                <section id="mission">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <span className={cn('p-2 rounded-lg', brand.iconBox)}>
+                                            <Box className="w-5 h-5" />
+                                        </span>
+                                        <h2 className="text-2xl font-bold text-foreground">{t('sections.missionBrief')}</h2>
+                                    </div>
+                                    <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-black prose-headings:tracking-tight prose-p:leading-loose text-zinc-600 dark:text-muted-foreground">
+                                        <p>{project.longDescription || project.description}</p>
+                                    </div>
+                                </section>
 
-                        {/* FEATURES (BENTO GRID - Adapted for 8 cols) */}
-                        {project.features && (
-                            <section id="features">
-                                <div className="flex items-center gap-3 mb-8">
-                                    <span className={cn('p-2 rounded-lg', brand.iconBox)}>
-                                        <Zap className="w-5 h-5" />
-                                    </span>
-                                    <h2 className="text-2xl font-bold text-foreground">{t('sections.keyFeatures')}</h2>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {project.features.map((group, idx) => (
-                                        <motion.div
-                                            key={idx}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            whileInView={{ opacity: 1, y: 0 }}
-                                            viewport={{ once: true }}
-                                            className="p-6 rounded-2xl bg-secondary/10 dark:bg-secondary/5 border border-black/25 dark:border-white/5 hover:border-black/35 dark:hover:border-white/10 transition-colors shadow-sm dark:shadow-none"
-                                        >
-                                            <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center mb-4', brand.iconBox)}>
-                                                {idx === 0 ? <Box className="w-5 h-5" /> : idx === 1 ? <Terminal className="w-5 h-5" /> : idx === 2 ? <Zap className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
-                                            </div>
-                                            <h3 className="text-lg font-bold text-foreground mb-3">{group.title}</h3>
-                                            <ul className="space-y-2">
-                                                {group.items.map((item, i) => (
-                                                    <li key={i} className="text-sm text-muted-foreground flex gap-2 items-start">
-                                                        <span className={cn('mt-1.5 w-1 h-1 rounded-full shrink-0', brand.bgDot)} />
-                                                        <span>{renderRichText(item)}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </motion.div>
-                                    ))}
-                                </div>
-                            </section>
-                        )}
-
-                        {/* ENGINEERING CHRONICLES (TIMELINE) */}
-                        {project.challengesAndSolutions && (
-                            <section id="chronicles">
-                                <div className="flex items-center gap-3 mb-8">
-                                    <span className={cn('p-2 rounded-lg', brand.iconBox)}>
-                                        <Terminal className="w-5 h-5" />
-                                    </span>
-                                    <h2 className="text-2xl font-bold text-foreground">{t('sections.engineeringChronicles')}</h2>
-                                </div>
-                                <div className="relative border-l border-black/40 dark:border-white/10 ml-3 space-y-12 pl-8 pb-4">
-                                    {project.challengesAndSolutions.map((item, idx) => (
-                                        <div key={idx} className="relative group">
-                                            <div className={cn('absolute -left-[37px] top-1 w-4 h-4 rounded-full bg-background border-2 border-black/40 dark:border-white/10 transition-colors z-10', brand.hoverBorder)} />
-                                            <h4 className={cn('text-lg font-bold text-foreground mb-2 transition-colors', brand.hoverText)}>
-                                                {item.problem}
-                                            </h4>
-                                            <div className="text-sm text-zinc-600 dark:text-muted-foreground pl-4 border-l border-black/30 dark:border-white/5">
-                                                <span className={cn('font-bold text-xs uppercase tracking-wider block mb-1', brand.text)}>{t('sections.solution')}</span>
-                                                {item.solution}
-                                            </div>
+                                {project.features && (
+                                    <section id="features">
+                                        <div className="flex items-center gap-3 mb-8">
+                                            <span className={cn('p-2 rounded-lg', brand.iconBox)}>
+                                                <Zap className="w-5 h-5" />
+                                            </span>
+                                            <h2 className="text-2xl font-bold text-foreground">{t('sections.keyFeatures')}</h2>
                                         </div>
-                                    ))}
-                                </div>
-                            </section>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {project.features.map((group, idx) => (
+                                                <motion.div
+                                                    key={idx}
+                                                    initial={{ opacity: 0, y: 20 }}
+                                                    whileInView={{ opacity: 1, y: 0 }}
+                                                    viewport={{ once: true }}
+                                                    className="p-6 rounded-2xl bg-secondary/10 dark:bg-secondary/5 border border-black/25 dark:border-white/5 hover:border-black/35 dark:hover:border-white/10 transition-colors shadow-sm dark:shadow-none"
+                                                >
+                                                    <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center mb-4', brand.iconBox)}>
+                                                        {idx === 0 ? <Box className="w-5 h-5" /> : idx === 1 ? <Terminal className="w-5 h-5" /> : idx === 2 ? <Zap className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
+                                                    </div>
+                                                    <h3 className="text-lg font-bold text-foreground mb-3">{group.title}</h3>
+                                                    <ul className="space-y-2">
+                                                        {group.items.map((item, i) => (
+                                                            <li key={i} className="text-sm text-muted-foreground flex gap-2 items-start">
+                                                                <span className={cn('mt-1.5 w-1 h-1 rounded-full shrink-0', brand.bgDot)} />
+                                                                <span>{renderRichText(item)}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {project.challengesAndSolutions && (
+                                    <section id="chronicles">
+                                        <div className="flex items-center gap-3 mb-8">
+                                            <span className={cn('p-2 rounded-lg', brand.iconBox)}>
+                                                <Terminal className="w-5 h-5" />
+                                            </span>
+                                            <h2 className="text-2xl font-bold text-foreground">{t('sections.engineeringChronicles')}</h2>
+                                        </div>
+                                        <div className="relative border-l border-black/40 dark:border-white/10 ml-3 space-y-12 pl-8 pb-4">
+                                            {project.challengesAndSolutions.map((item, idx) => (
+                                                <div key={idx} className="relative group">
+                                                    <div className={cn('absolute -left-[37px] top-1 w-4 h-4 rounded-full bg-background border-2 border-black/40 dark:border-white/10 transition-colors z-10', brand.hoverBorder)} />
+                                                    <h4 className={cn('text-lg font-bold text-foreground mb-2 transition-colors', brand.hoverText)}>
+                                                        {item.problem}
+                                                    </h4>
+                                                    <div className="text-sm text-zinc-600 dark:text-muted-foreground pl-4 border-l border-black/30 dark:border-white/5">
+                                                        <span className={cn('font-bold text-xs uppercase tracking-wider block mb-1', brand.text)}>{t('sections.solutionLabel')}</span>
+                                                        {item.solution}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {project.galleryImages && project.galleryImages.length > 0 && (
+                                    <section id="gallery">
+                                        <div className="flex items-center gap-3 mb-8">
+                                            <span className={cn('p-2 rounded-lg', brand.iconBox)}>
+                                                <LayoutGrid className="w-5 h-5" />
+                                            </span>
+                                            <h2 className="text-2xl font-bold text-foreground">{t('sections.visualGallery')}</h2>
+                                        </div>
+                                        <ProjectGalleryTeaser
+                                            image={project.galleryImages[0]}
+                                            imageCount={slideshowImages.length}
+                                            onOpen={() => openSlideshowAt(project.galleryImages![0])}
+                                        />
+                                    </section>
+                                )}
+                            </>
                         )}
 
-                        {/* GALLERY — single teaser → modal slideshow */}
-                        {project.galleryImages && project.galleryImages.length > 0 && (
-                            <section id="gallery">
-                                <div className="flex items-center gap-3 mb-8">
-                                    <span className={cn('p-2 rounded-lg', brand.iconBox)}>
-                                        <LayoutGrid className="w-5 h-5" />
-                                    </span>
-                                    <h2 className="text-2xl font-bold text-foreground">{t('sections.visualGallery')}</h2>
-                                </div>
-                                <ProjectGalleryTeaser
-                                    image={project.galleryImages[0]}
-                                    imageCount={slideshowImages.length}
-                                    onOpen={() => {
-                                        const start = project.image
-                                            ? slideshowImages.indexOf(project.galleryImages![0])
-                                            : 0;
-                                        openSlideshow(start >= 0 ? start : 0);
-                                    }}
-                                    mockupUrl={
-                                        project.demoUrl
-                                            ? project.demoUrl.replace(/^https?:\/\//, '')
-                                            : `${project.title.toLowerCase()}.app`
-                                    }
-                                />
-                            </section>
-                        )}
-
-                        {/* INSTALLATION */}
+                        {/* INSTALLATION (shared) */}
                         {project.installation && (
                             <section id="installation">
                                 <div className="flex items-center gap-3 mb-8">

@@ -74,61 +74,130 @@ export const portfolioData: PortfolioData = {
                 'Multi-page marketing system',
                 'Passcode-gated platform entry',
             ],
-            features: [
+            caseStudy: [
                 {
-                    title: 'Product-First Hero',
-                    items: [
-                        'Put the working address search, promise headline, and example result chips in the first viewport so the first interaction is the product, not a signup form.',
-                        'Locked the headline to the measurable promise — **a feasibility answer in under a minute** — instead of generic marketing copy.',
-                        'Implemented it as a composed **HeroSection** with search/copy areas — a live UI composition, not a static marketing image.',
+                    id: 'problem',
+                    label: 'Problem',
+                    body: 'A brochure marketing site would undersell Primer. Visitors need to feel the product before they sign up: type an address, see a feasibility read path, and trust the system without loading the full app.',
+                    blocks: [
+                        {
+                            title: 'Opportunity',
+                            body: 'Make the first interaction the product itself. Put search, promise, and proof in the first viewport so the marketing surface converts curiosity into a product moment.',
+                        },
                     ],
                 },
                 {
-                    title: 'Proof in the Interface',
-                    items: [
-                        'Surfaced live parcel coverage, county count, and median run time under the search as running system state so proof sits in the UI, not in a feature list.',
-                        'Showed product surfaces — property detail, parcel map, saved sets — without forcing signup.',
-                        'Built a dashboard mock band and sticky **product-flow** sections wired with real UI captures so visitors see the product without loading the app.',
+                    id: 'approach',
+                    label: 'Approach',
+                    body: 'Scope stayed tight: ship a multi-page marketing OS that feels like Primer without embedding the SPA, keep every public statistic real, and gate platform entry without hiding the product story.',
+                    blocks: [
+                        {
+                            title: 'Product presence without the full app',
+                            body: 'Dashboard mock and sticky product-flow bands use real UI captures so visitors see the product without shipping the live application in the marketing bundle.',
+                        },
+                        {
+                            title: 'Editable copy without a CMS',
+                            body: 'Sections stay presentational. Copy lives in content collections with accessors for pricing, use cases, posts, and legal.',
+                        },
+                        {
+                            title: 'Gated access, public marketing',
+                            body: 'Login and free-trial CTAs route to /access with a serverless passcode check so marketing stays public and the product stays private.',
+                        },
+                        {
+                            title: 'Only verified numbers',
+                            body: 'Public stats are constrained to verified product facts in content data (avg 58s, 3,142 counties). Market figures are labelled explicitly.',
+                        },
                     ],
                 },
                 {
-                    title: 'Visual System That Scales',
-                    items: [
-                        'Defined a light grain stage, floating **pill nav**, Primer mark, and motion that adds presence without stealing the search CTA.',
-                        'Kept pricing, use cases, insights, and legal in one visual family so the marketing surface reads as one product.',
-                        'Implemented shared **design tokens** and chrome (`library/tokens`, Nav, Footer, InteractiveDotField) reused by every route.',
+                    id: 'architecture',
+                    label: 'Architecture',
+                    body: 'Vite/React marketing OS with a predictable page tree, shared design tokens, and Vercel API routes for contact, public config, and the access gate.',
+                    blocks: [
+                        {
+                            title: 'Page structure',
+                            body: '**Page → Section → Area → Frame → Component** so new bands land in a predictable tree across home, pricing, use cases, insights, contact, access, and legal.',
+                        },
+                        {
+                            title: 'One job per page',
+                            body: 'Each route converts, explains, gates, or handles legal so IA stays scannable as the surface grows.',
+                        },
+                        {
+                            title: 'Shared system',
+                            body: 'Design tokens and chrome (library/tokens, Nav, Footer, InteractiveDotField) reused by every route.',
+                        },
                     ],
                 },
                 {
-                    title: 'Marketing-Site Architecture',
-                    items: [
-                        'Gave each page a single job — convert, explain, gate, or legal — so IA stayed scannable as the surface grew.',
-                        'Structured the codebase as **Page → Section → Area → Frame → Component** so new bands land in a predictable tree.',
-                        'Shipped content collections/accessors, React Router routes, and Vercel **api/** endpoints for contact, public config, and the passcode access gate.',
+                    id: 'exploration',
+                    label: 'Exploration',
+                    body: 'Key design and engineering decisions that shaped the first viewport and the system behind it.',
+                    blocks: [
+                        {
+                            title: 'Product-first hero',
+                            body: 'Working address search, promise headline, and example result chips in the first viewport. Headline locked to **a feasibility answer in under a minute**. Implemented as a composed **HeroSection**, not a static marketing image.',
+                        },
+                        {
+                            title: 'Proof in the interface',
+                            body: 'Live parcel coverage, county count, and median run time sit under the search as system state. Product surfaces (property detail, parcel map, saved sets) show without forcing signup.',
+                            image: '/project/primer2.webp',
+                        },
+                        {
+                            title: 'Visual system that scales',
+                            body: 'Light grain stage, floating **pill nav**, Primer mark, and motion that adds presence without stealing the search CTA. Pricing, use cases, insights, and legal stay in one visual family.',
+                            image: '/project/primer3.webp',
+                        },
+                    ],
+                    images: ['/project/primer4.webp'],
+                },
+                {
+                    id: 'solution',
+                    label: 'Solution',
+                    body: 'The shipped marketing system at primer.city: product-first home, multi-page IA, and a walkthrough of the final surfaces.',
+                    images: [
+                        '/project/primer5.webp',
+                        '/project/primer6.webp',
+                        '/project/primer7.webp',
+                        '/project/primer8.webp',
                     ],
                 },
-            ],
-            challengesAndSolutions: [
                 {
-                    problem:
-                        'The site had to feel like the product without shipping the full app in the marketing bundle.',
-                    solution:
-                        'Designed a dashboard mock and sticky product-flow band, then composed them in the page tree with real UI assets — product presence without embedding the SPA.',
+                    id: 'outcome',
+                    label: 'Outcome',
+                    body: 'Shipped scope only. No invented conversion metrics.',
+                    blocks: [
+                        {
+                            title: 'Live multi-page system',
+                            body: 'Home, pricing, use cases, insights, contact, access, and legal shipped as one product-feeling marketing OS.',
+                        },
+                        {
+                            title: 'End-to-end ownership',
+                            body: 'Designed and engineered the visual system, IA, interaction, and implementation.',
+                        },
+                        {
+                            title: 'Controlled product entry',
+                            body: 'Passcode-gated platform entry via /access while keeping the public story intact.',
+                        },
+                    ],
                 },
                 {
-                    problem: 'Multi-page marketing without a CMS still needed consistent, editable copy.',
-                    solution:
-                        'Kept sections presentational and moved copy into content collections with accessors for pricing, use cases, posts, and legal — editable data, dumb UI.',
+                    id: 'validation',
+                    label: 'Validation',
+                    blocks: [
+                        {
+                            title: 'Proven',
+                            body: 'Live site at primer.city. Multi-page marketing system in production. Access gate and content model in use.',
+                        },
+                        {
+                            title: 'Still hypothesis',
+                            body: 'Long-term conversion lift from product-first hero vs a classic brochure layout is not claimed here without measured funnel data.',
+                        },
+                    ],
                 },
                 {
-                    problem: 'Early access required without exposing the live platform on public CTAs.',
-                    solution:
-                        'Routed login and free-trial CTAs to `/access` and backed the passcode check with a serverless gate so marketing stays public and the product stays private.',
-                },
-                {
-                    problem: 'Every public statistic had to be real — no invented marketing numbers.',
-                    solution:
-                        'Constrained design and use-case content to verified product facts in the content data (avg 58s, 3,142 counties) and labelled market figures explicitly.',
+                    id: 'reflection',
+                    label: 'Reflection',
+                    body: 'For a Design Engineer case study, the useful unit of work is a decision with an implementation consequence. Primer works as a 0-to-1 story because the hero, proof, IA, and gate were designed and coded as one system, not a deck handed off to engineering.',
                 },
             ],
         },

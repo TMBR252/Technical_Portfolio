@@ -39,4 +39,9 @@ npm start
 
 ## Project case studies
 
-Case study data lives in [`src/data/portfolio.ts`](src/data/portfolio.ts). Images for a project titled `Primer` resolve from `public/project/primer{1..10}.webp` via [`getProjectImages`](src/app/actions/getProjectImages.ts).
+Case study data lives in [`src/data/portfolio.ts`](src/data/portfolio.ts).
+
+- Prefer optional `caseStudy: CaseStudySection[]` (problem, approach, architecture, exploration, solution, outcome, validation, reflection, …). Only include sections that apply; TOC and page follow array order.
+- Legacy `features` / `challengesAndSolutions` / gallery still render when `caseStudy` is absent.
+- Hero/media use chrome-free [`ProjectMedia`](src/components/projects/ProjectMedia.tsx) (no browser traffic lights or URL bar).
+- Images for a project titled `Primer` resolve from `public/project/primer{1..10}.webp` via [`getProjectImages`](src/app/actions/getProjectImages.ts).
