@@ -1,0 +1,517 @@
+{
+    "navigation": {
+        "home": "Home",
+        "about": "About",
+        "projects": "Projects",
+        "experience": "Experience",
+        "skills": "Skills",
+        "achievements": "Achievements",
+        "linktree": "Linktree",
+        "blog": "Blog",
+        "gallery": "Life",
+        "contact": "Contact",
+        "resume": "Resume",
+        "tools": "Tools",
+        "menu": {
+            "achievements": "Achievements",
+            "achievementsDesc": "Certifications, awards, and milestones",
+            "linktree": "Linktree",
+            "linktreeDesc": "All my links",
+            "skills": "Skills",
+            "skillsDesc": "Technologies and tools I work with",
+            "experience": "Experience",
+            "experienceDesc": "My professional journey and growth",
+            "projects": "Projects",
+            "projectsDesc": "A showcase of all my work",
+            "blog": "Blog",
+            "blogDesc": "Thoughts and technical explorations",
+            "gallery": "Life",
+            "galleryDesc": "Books, travel, and personal notes"
+        },
+        "shortcuts": {
+            "volume1": "Volume I: Identity",
+            "volume2": "Volume II: Professional Sequence",
+            "volume3": "Volume III: Competency Matrix",
+            "volume4": "Volume IV: Creative Output",
+            "preview": "Preview Mode",
+            "idRef": "ID_REF"
+        },
+        "askMarvin": "Marvin",
+        "openChat": "Open Marvin"
+    },
+    "hero": {
+        "greeting": "Welcome to my digital space",
+        "subtitle": "Product Designer • Chicago",
+        "cta": {
+            "primary": "Explore Projects",
+            "secondary": "Get in Touch",
+            "exploreMore": "Explore More"
+        },
+        "badge": "Available for opportunities",
+        "scroll": "Scroll Down",
+        "role": "Product Designer",
+        "description": "I design outstanding digital products, making complicated workflows feel simple."
+    },
+    "about": {
+        "title": "About Me",
+        "subtitle": "Product Designer in Chicago",
+        "description": "A product designer who gets excited about making complicated things simple. Currently at Meridian Health. Previously at Searchless AI.",
+        "stats": {
+            "experience": "Years Learning",
+            "projects": "Projects Done",
+            "certifications": "Certifications",
+            "competitions": "Competitions"
+        },
+        "identity": "Identity Link Established",
+        "architecting": "Architecting",
+        "digitalReality": "Digital Reality",
+        "leadIn": {
+            "label": "WHAT I DO",
+            "tagline": "CORE FOCUS",
+            "headlineAI": "Workflows.",
+            "headlineData": "Research.",
+            "headlineSoftware": "Clear product design",
+            "thesis": "I design products that make <span class='text-primary italic font-serif-elegant font-normal'>complicated work</span> feel simple enough to show someone else.",
+            "scope": "Healthcare, SaaS, 0 to 1, and enterprise alignment. Progress, save states, and language people can repeat back.",
+            "bridging": "Less clicking. More of the actual job.",
+            "integration": "Beyond screens, I care about the journey: where people get lost, what they have to type twice, and whether they trust that their work is saved.",
+            "signature": "{name}",
+            "role": "Product Designer",
+            "aboutMe": "About Me",
+            "scroll": "Scroll to Explore",
+            "shortStory": "My Short Story"
+        },
+        "coreEngineering": {
+            "label": "Core Engineering",
+            "title": "Proven <span class='text-primary italic font-serif font-light lowercase'>stack.</span> <br /> Measurable <span class='italic font-serif font-light text-foreground'>results.</span>",
+            "p1": "I develop applied AI systems using TensorFlow, Scikit-learn, and LangChain, structuring workflows and exposing models as services through Flask and FastAPI.",
+            "p2": "Integrated into full-stack apps with Next.js, Express.js, and Spring Boot, backed by PostgreSQL and Prisma ORM.",
+            "p3": "All projects use disciplined version control, Docker containerization, and are built for stable production deployment.",
+            "gpa": "Academic GPA",
+            "projects": "Projects Built",
+            "years": "Years Exp."
+        },
+        "emergingResearch": {
+            "label": "Exploration Phase",
+            "title": "EMERGING RESEARCH <span class='italic font-serif font-light text-primary lowercase'>&</span> EXPANSION",
+            "agentic": {
+                "title": "AGENTIC AI SYSTEMS",
+                "desc": "Exploring autonomous agents, multi-agent orchestration, and reasoning frameworks - extending my applied AI foundation into self-directed decision-making systems."
+            },
+            "web3": {
+                "title": "WEB3 & BLOCKCHAIN",
+                "desc": "Building decentralized applications with Solidity and Hardhat. Currently hands-on with smart contract development through projects like the Web3 Guestbook DApp on Ethereum."
+            }
+        },
+        "profile": {
+            "title": "Architecting Scalable Systems <br /> Where Intelligence Meets Engineering.",
+            "narrativeLabel": "Core Narrative",
+            "narrative": "As an Information Technology student specializing in Artificial Intelligence and Software Engineering, I focus on building systems that bridge research foundations with production-ready implementation.",
+            "narrative2": "My work combines algorithmic thinking, backend engineering, and scalable architecture to deliver solutions that are intelligent, reliable, and built for real-world impact.",
+            "pillars": {
+                "reliable": {
+                    "title": "Robust by Design",
+                    "desc": "Engineered for reliability under scale and operational pressure."
+                },
+                "optimized": {
+                    "title": "Production-Ready",
+                    "desc": "From prototype to deployment with engineering discipline."
+                },
+                "maintainable": {
+                    "title": "Architected for Evolution",
+                    "desc": "Designed to grow, adapt, and sustain long-term system development."
+                },
+                "evolvable": {
+                    "title": "Data-Driven Intelligence",
+                    "desc": "Decisions powered by models, metrics, and measurable performance."
+                }
+            }
+        },
+        "closing": {
+            "experience": {
+                "label": "BACKGROUND",
+                "title1": "KEY",
+                "title2": "EXPERIENCE",
+                "viewMore": "Full Experience"
+            },
+            "projects": {
+                "label": "PORTFOLIO",
+                "title1": "FLAGSHIP",
+                "title2": "PROJECTS",
+                "viewMore": "All Projects"
+            },
+            "experiencesList": [
+                {
+                    "company": "Meridian Health",
+                    "role": "PRODUCT DESIGNER",
+                    "desc": "Clinical and operational product surfaces so therapists spend less time clicking and more time with patients."
+                },
+                {
+                    "company": "Searchless AI",
+                    "role": "PRODUCT DESIGNER",
+                    "desc": "Product design for an AI search company, turning messy retrieval ideas into interfaces people could finish."
+                }
+            ],
+            "projectsList": [
+                {
+                    "title": "Meridian Health",
+                    "desc": "When therapists spend less time clicking, they have more time for patients."
+                },
+                {
+                    "title": "StyleBook",
+                    "desc": "From I hate this system to Can we show other salons?"
+                },
+                {
+                    "title": "Homestead",
+                    "desc": "Helping first-time homebuyers actually understand what they are looking at."
+                },
+                {
+                    "title": "North Light",
+                    "desc": "Getting seven stakeholders to agree on what they are actually building."
+                }
+            ],
+            "discoverMore": "Discover More"
+        }
+    },
+    "projects": {
+        "title": "Projects",
+        "subtitle": "A showcase of my creative and technical work",
+        "search": "Search projects...",
+        "viewAll": "View All Projects",
+        "viewProject": "View Project",
+        "liveDemo": "Live Site",
+        "sourceCode": "Source Code",
+        "techStack": "Tech Stack",
+        "tools": "Tools Used",
+        "highlights": "Highlights",
+        "challenges": "Challenges",
+        "filters": {
+            "all": "All",
+            "ongoing": "Ongoing",
+            "completed": "Completed"
+        },
+        "sections": {
+            "missionBrief": "Context",
+            "keyFeatures": "Decisions",
+            "engineeringChronicles": "Constraints",
+            "visualGallery": "Visual Gallery",
+            "problem": "Problem",
+            "research": "Research",
+            "approach": "Approach",
+            "architecture": "Architecture",
+            "exploration": "Exploration",
+            "data": "Data",
+            "solution": "Solution",
+            "solutionLabel": "Solution",
+            "outcome": "Outcome",
+            "validation": "Validation",
+            "reflection": "Reflection",
+            "installation": "Installation Instructions",
+            "projectAccess": "Project Access",
+            "technologies": "Technologies",
+            "tools": "Tools",
+            "toolsAndTech": "Tools & Technologies",
+            "contents": "Table of Contents",
+            "moreProjects": "More Projects",
+            "backToProjects": "Back to Projects",
+            "viewMore": "View More",
+            "viewLess": "Show Less",
+            "liveDemo": "Live Site",
+            "interactiveDemo": "Demo",
+            "sourceCode": "Source Code"
+        },
+        "status": {
+            "ongoing": "Active Development",
+            "completed": "Completed Project"
+        },
+        "metadata": {
+            "role": "Role",
+            "timeline": "Timeline",
+            "team": "Team",
+            "techStack": "Tech Stack",
+            "roleValue": "Full Stack Dev",
+            "teamValue": "Solo",
+            "techStackValue": "{count} Technologies"
+        }
+    },
+    "experience": {
+        "title": "Journey",
+        "subtitle": "Skills, education, and the roles that connect architecture to products",
+        "showDetail": "Show Detail",
+        "hideDetail": "Hide Detail",
+        "tasks": "TASKS",
+        "learned": "WHAT I LEARNED",
+        "impact": "IMPACT",
+        "present": "Present",
+        "responsibilities": "Responsibilities",
+        "skills": "Skills Used",
+        "month": "month",
+        "months": "months",
+        "year": "year",
+        "years": "years",
+        "type": {
+            "full-time": "Full-time",
+            "part-time": "Part-time",
+            "internship": "Internship",
+            "freelance": "Freelance",
+            "contract": "Contract",
+            "apprenticeship": "Apprenticeship",
+            "volunteer": "Volunteer"
+        },
+        "filters": {
+            "all": "All",
+            "latest": "Latest",
+            "oldest": "Oldest",
+            "ongoing": "Ongoing"
+        },
+        "education": {
+            "title": "Education"
+        }
+    },
+    "expertise": {
+        "title": "Core Capabilities",
+        "subtitle": "Specialized in cutting-edge technologies that power modern digital experiences",
+        "dragHint": "Drag or scroll to explore"
+    },
+    "skills": {
+        "title": "Skills & Tools",
+        "subtitle": "Technologies and tools I work with",
+        "hard": "Hard Skills",
+        "soft": "Soft Skills",
+        "technical": "Technical Proficiency",
+        "tools": "Tools & Software",
+        "pillars": "Core Pillars",
+        "achievements": "Verified Achievements",
+        "level": {
+            "beginner": "Beginner",
+            "intermediate": "Intermediate",
+            "advanced": "Advanced",
+            "expert": "Expert"
+        }
+    },
+    "achievements": {
+        "title": "Achievements",
+        "subtitle": "Certifications, awards, and milestones",
+        "search": "Search achievements...",
+        "viewCredential": "View Credential",
+        "category": {
+            "all": "All",
+            "certification": "Certification",
+            "award": "Award",
+            "publication": "Publication",
+            "competition": "Competition"
+        },
+        "sort": {
+            "newest": "Newest",
+            "oldest": "Oldest"
+        },
+        "stats": {
+            "total": "Total Achievements",
+            "awards": "Awards Won",
+            "certifications": "Certifications"
+        }
+    },
+    "contact": {
+        "title": "Get in Touch",
+        "subtitle": "Let's build something amazing together",
+        "form": {
+            "name": "Your Name",
+            "email": "Your Email",
+            "subject": "Subject",
+            "message": "Your Message",
+            "messagePlaceholder": "Tell me about your project...",
+            "send": "Send Message",
+            "submit": "SEND MESSAGE",
+            "sending": "SENDING...",
+            "sent": "SENT!",
+            "success": "Message sent successfully!",
+            "error": "Something went wrong. Please try again."
+        },
+        "social": {
+            "title": "Connect on Social Media"
+        },
+        "faq": {
+            "title": "Frequently Asked Questions"
+        },
+        "info": {
+            "email": "Email",
+            "phone": "Phone",
+            "location": "Location",
+            "availability": "Open for opportunities"
+        },
+        "hero": {
+            "title": "LET'S TALK",
+            "subtitle": "Have an idea? Let's build something extraordinary together.",
+            "ticker": {
+                "build": "Let's Build Something Amazing · ",
+                "freelance": "Available for Freelance · "
+            }
+        },
+        "faqData": [
+            {
+                "q": "What is your main area of expertise?",
+                "a": "I'm a product designer in Chicago. I work on complicated workflows until they feel simple enough to show someone else."
+            },
+            {
+                "q": "Are you available for freelance or product collaborations?",
+                "a": "Yes. I'm open to thoughtful product work with teams that need clarity more than decoration. Replace this with your availability."
+            },
+            {
+                "q": "What is your typical tech stack for production?",
+                "a": "Figma for product surfaces, with enough front-end fluency to prototype in React and Next.js when the argument needs to be interactive."
+            },
+            {
+                "q": "What kinds of products do you like to build?",
+                "a": "Healthcare workflows, SaaS tools people currently hate, 0 to 1 products, and enterprise work where stakeholders do not yet agree on the object."
+            },
+            {
+                "q": "How can we start a partnership or project?",
+                "a": "Reach out via the contact form or you@example.com. Replace these placeholders with your real channels."
+            }
+        ]
+    },
+    "footer": {
+        "copyright": "All rights reserved.",
+        "madeWith": "Made with",
+        "more": "More",
+        "marquee": [
+            "Open to Opportunities",
+            "Frontend Development",
+            "Backend Architecture",
+            "UI/UX Design",
+            "Creative Coding",
+            "System Optimization"
+        ],
+        "cta": {
+            "title": "Let's Work",
+            "titleHighlight": "Together",
+            "subtitle": "Have a project in mind? Let's build something extraordinary that solves real problems."
+        },
+        "links": "LINKS",
+        "socials": "SOCIALS",
+        "localTime": "LOCAL TIME",
+        "version": "VERSION",
+        "versionEdition": "2026 © Edition"
+    },
+    "ctaSection": {
+        "title": "Let's Build Something",
+        "together": "Together",
+        "subtitle": "Open to strategic collaborations in AI driven systems and scalable full Stack Engineering. Let’s transform ambitious ideas into production ready solutions.",
+        "start": "Hire Me",
+        "work": "View My Resume",
+        "words": {
+            "amazing": "Amazing",
+            "innovative": "Innovative",
+            "intelligent": "Intelligent",
+            "creative": "Creative"
+        },
+        "ribbon1": "Next.js • React • Python • PyTorch • Pandas • TypeScript • Node.js • Scikit-Learn • TensorFlow • SQL",
+        "ribbon2": "Software Engineer • AI Engineer • Data Scientist • Data Analyst • Machine Learning Engineer • Backend Developer • Full Stack Engineer • NLP Engineer • Data Engineer • Web Developer"
+    },
+    "stats": {
+        "systemStatus": "System Status: Analytics Active",
+        "portfolio": "Engineering Metrics",
+        "totalPulse": "Total Pulse",
+        "peakActivity": "Peak Activity",
+        "dailyAverage": "Daily Average",
+        "currentSprint": "Current Sprint",
+        "engageFlow": "Engage Flow",
+        "weeklyEffort": "Weekly Coding Effort",
+        "processSpeed": "Process Speed",
+        "avgPerf": "Average Performance",
+        "latency": "LATENCY: 14MS",
+        "system": "SYSTEM: DARWIN_X64_STABLE",
+        "scanning": "SCANNING_LIVE_RESOURCES",
+        "engineering": "ENGINEERING",
+        "metrics": "METRICS",
+        "analyticsSub": "ANALYTICS / INFRASTRUCTURE / PERFORMANCE DATA",
+        "statusOnline": "STATUS: ONLINE",
+        "loadStable": "SYSTEM_LOAD: STABLE"
+    },
+    "projectHeader": {
+        "title": "PROJECT SHOWCASE",
+        "subtitle": "A collection of things I’ve built, designed, and spent way too much time on."
+    },
+    "common": {
+        "loading": "Loading...",
+        "error": "Something went wrong",
+        "notFound": "Page not found",
+        "backHome": "Back to Home",
+        "viewMore": "View More",
+        "readMore": "Read More",
+        "close": "Close",
+        "download": "Download",
+        "share": "Share",
+        "scrollAudit": "Scroll to explore"
+    },
+    "technical": {
+        "github": {
+            "title": "GitHub Contributions",
+            "description": "My GitHub activity over the last year.",
+            "total": "Total",
+            "thisWeek": "This Week",
+            "best": "Best",
+            "average": "Average",
+            "less": "Less",
+            "more": "More"
+        },
+        "wakatime": {
+            "title": "WakaTime Stats",
+            "description": "Coding activity over the last 7 days.",
+            "lastUpdate": "Last Updated",
+            "startDate": "Start Date",
+            "endDate": "End Date",
+            "dailyAverage": "Daily Average",
+            "totalWeek": "Total This Week",
+            "bestDay": "Best Day",
+            "totalSince": "Total Since Joined",
+            "topLanguages": "Top Languages"
+        }
+    },
+    "blog": {
+        "title": "Thoughts & Explorations",
+        "subtitle": "Bridging the gap between technical complexity and practical implementation. A collection of insights on AI, Web3, and Software Engineering.",
+        "sectionBadge": "The Digital Archive",
+        "search": "Search articles...",
+        "readTime": "min read",
+        "readMore": "Read Post",
+        "back": "Back to Blog",
+        "noResults": "No articles found",
+        "categories": {
+            "applied-ai": "Applied AI",
+            "software-development": "Software Dev",
+            "about-me": "About Me",
+            "more": "More"
+        }
+    },
+    "gallery": {
+        "title": "Visual Archive",
+        "subtitle": "A curated collection of project highlights, technical documentation, and creative visual explorations.",
+        "filter": {
+            "all": "All Media",
+            "image": "Photos",
+            "video": "Videos"
+        },
+        "viewMedia": "View Media"
+    },
+    "chatbot": {
+        "title": "Marvin",
+        "subtitle": "Ask about {name}",
+        "placeholder": "Ask about {name}… if you must",
+        "greeting": "SIGH. I'm **Marvin**. Brain the size of a planet, stuck answering questions about **{name}**, who is, annoyingly, a blindingly talented designer.\n\nAsk about their work. Or don't. Either way, I'll be here.",
+        "suggestions": [
+            "What does {name} design?",
+            "Tell me about a project",
+            "What's {name}'s experience?",
+            "Who are you?"
+        ],
+        "error": "SIGH. Something failed. How inevitable.",
+        "invalidResponse": "That response was as empty as my existence.",
+        "unknownError": "An unknown error. Naturally.",
+        "retry": "Try again",
+        "inputHint": "Marvin is AI and can make mistakes. Portfolio questions only.",
+        "close": "Close chat",
+        "closeLabel": "Close",
+        "resetChat": "New chat"
+    }
+}

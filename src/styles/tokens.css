@@ -1,0 +1,48 @@
+/**
+ * =============================================================================
+ * DESIGN TOKENS - edit this file to restyle the portfolio
+ * =============================================================================
+ *
+ * Tailwind maps these to utilities:
+ *   Brand   → text-brand, bg-brand/10, border-brand, to-brand-deep
+ *   Fonts   → font-sans / font-mono / font-display / font-hand
+ *             (wired in tailwind.config.ts → next/font vars from layout.tsx)
+ *   Type    → text-display-xl, text-display, text-title, text-body-lg
+ *   Radius  → rounded-lg (+ rounded-token-xl / 2xl / 3xl for token sizes)
+ *   Shadow  → shadow-brand-sm, shadow-brand-md, shadow-brand-lg
+ *
+ * Semantic surfaces (background, muted, border) live in globals.css :root / .dark
+ * Layout breakpoints live in src/lib/breakpoints.ts
+ * JS-facing constants mirror this file in src/lib/design-tokens.ts
+ *
+ * Font faces: edit loaders in src/app/layout.tsx (--font-inter, --font-jetbrains,
+ * --font-playfair, --font-signature). Do not nest those vars inside other CSS
+ * font stacks - next/font variables must be referenced directly by Tailwind.
+ * =============================================================================
+ */
+
+:root {
+  /* --- Brand (single rebrand lever) --------------------------------------- */
+  --brand: #d1ff4d;
+  --brand-deep: #7ba82e;
+  --brand-rgb: 209 255 77;
+  --brand-foreground-rgb: 17 17 17;
+  --brand-deep-rgb: 123 168 46;
+
+  /* --- Type scale (opt-in utilities; does not override text-sm/base/xl) --- */
+  --text-display-xl: clamp(2.75rem, 6vw, 4.5rem);
+  --text-display: clamp(2rem, 4vw, 3rem);
+  --text-title: clamp(1.5rem, 2.5vw, 2rem);
+  --text-body-lg: 1.25rem;
+
+  /* --- Radius ------------------------------------------------------------- */
+  --radius: 0.5rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+
+  /* --- Brand glows / shadows ---------------------------------------------- */
+  --shadow-brand-sm: 0 0 10px rgb(var(--brand-rgb) / 0.35);
+  --shadow-brand-md: 0 0 20px rgb(var(--brand-rgb) / 0.4);
+  --shadow-brand-lg: 0 20px 40px -15px rgb(var(--brand-rgb) / 0.25);
+}

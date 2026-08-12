@@ -1,0 +1,40 @@
+---
+description: Framer-style breakpoint isolation — separate DOM when absolute/positioned layouts conflict across bands
+globs:
+  - src/components/sections/HeroVisual.tsx
+  - src/app/page.tsx
+  - src/lib/breakpoints.ts
+alwaysApply: false
+---
+
+# Responsive breakpoints (band isolation)
+
+Source of truth: [`src/lib/breakpoints.ts`](src/lib/breakpoints.ts)
+
+| Band | Width | Tailwind |
+|------|-------|----------|
+| mobile (phone) | `< 768` | default / `md:hidden` |
+| tablet | `768–1023` | `md:` |
+| desktop | `≥ 1024` | `lg:` |
+
+## Rule
+
+When a layout uses **absolute positioning**, competing offsets, or oversized clamps that break a smaller band:
+
+1. **Do not** share one absolute node across phone and md+ with conflicting offsets.
+2. **Duplicate DOM per band** and toggle with `md:hidden` / `hidden md:block` (or `lg:hidden` / `hidden lg:block` for title systems).
+3. Prefer **freezing** working md+/lg+ class strings; only add visibility wrappers when fixing phone.
+
+## Landing hero (current contract)
+
+- Phone (`md:hidden`): stepped shiny titles, static social row (48px), stacked intro/collab
+- Tablet (`md`–`lg`): side intro/collab, shiny titles, absolute social floats at frozen offsets
+- Desktop (`lg+`): BlockWarp titles, absolute Framer social floats at frozen offsets, compact nav (40px)
+
+Google / Material: interactive targets ≥48×48 with ≥8dp gaps on phone and tablet; hover tooltips only when `(hover: hover) and (pointer: fine)`.
+
+## Anti-patterns
+
+- Tuning “mobile” offsets on shared absolute nodes (breaks desktop)
+- One `clamp(3rem,11vw,13rem)` shared across phone and tablet for hero titles
+- Editing md:/lg: spacing while “just fixing phone”

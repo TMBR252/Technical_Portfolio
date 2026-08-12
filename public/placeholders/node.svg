@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800" role="img" aria-label="Node">
+  <rect width="100%" height="100%" fill="#0a0a0f"/>
+  <rect x="28" y="28" width="744" height="744" fill="none" stroke="#d1ff4d" stroke-width="2"/>
+  <text x="400" y="392" text-anchor="middle" fill="#d1ff4d" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="44" letter-spacing="0.14em">NODE</text>
+  <text x="400" y="432" text-anchor="middle" fill="#7ba82e" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16">PLACEHOLDER</text>
+</svg>
