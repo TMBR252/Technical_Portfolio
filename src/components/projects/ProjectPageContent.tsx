@@ -15,7 +15,7 @@ import Link from 'next/link';
 import { portfolioData } from '@/data/portfolio';
 import type { CaseStudyEvidencePlaceholder, CaseStudySection, TechGroup } from '@/types';
 import { useMarvinPageContext } from '@/providers/MarvinPageContextProvider';
-import { buildMarvinPageContext } from '@/lib/marvin-page-context';
+import { buildMarvinPageContext } from '@/lib/marvin/page-context';
 import { MarvinChromeControls } from '@/components/layout/MarvinChromeControls';
 
 const brand = {

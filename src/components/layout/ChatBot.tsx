@@ -19,6 +19,13 @@ import { portfolioData } from "@/data/portfolio";
 import { useTranslations, useLocale } from "next-intl";
 import { BREAKPOINTS, getViewportWidth, isBelowMd } from "@/lib/breakpoints";
 import { useMarvinPageContextOptional } from "@/providers/MarvinPageContextProvider";
+import {
+    inputPlaceholder,
+    pickEmptyReply,
+    pickOpener,
+    pickRequestFailed,
+} from "@/lib/marvin/voice";
+import { MAX_INPUT_LENGTH } from "@/lib/marvin/limits";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Message {
@@ -27,6 +34,8 @@ interface Message {
     content: string;
     timestamp: Date;
     error?: boolean;
+    /** Written by the client, not the model. Never sent back as history. */
+    local?: boolean;
     imagePreview?: string;
 }
 
@@ -330,8 +339,9 @@ function ChatWindow({
             {
                 id: generateId(),
                 role: "assistant",
-                content: t("greeting", { name: portfolioData.personal.name }),
+                content: pickOpener(portfolioData.personal.name),
                 timestamp: new Date(),
+                local: true,
             },
         ];
     });
@@ -376,8 +386,9 @@ function ChatWindow({
         const greeting: Message = {
             id: generateId(),
             role: "assistant",
-            content: t("greeting", { name: portfolioData.personal.name }),
+            content: pickOpener(portfolioData.personal.name),
             timestamp: new Date(),
+            local: true,
         };
         setMessages([greeting]);
         try {
@@ -455,7 +466,7 @@ function ChatWindow({
 
     const sendMessage = useCallback(
         async (text: string, imageBase64?: string | null, imagePreview?: string | null) => {
-            const trimmed = text.trim().slice(0, 200);
+            const trimmed = text.trim().slice(0, MAX_INPUT_LENGTH);
             const image = imageBase64 ?? pendingImage?.base64 ?? null;
             const preview = imagePreview ?? pendingImage?.preview ?? null;
             if (!trimmed && !image) return;
@@ -478,9 +489,10 @@ function ChatWindow({
             setMessages((prev) => [...prev, userMsg]);
             setIsLoading(true);
 
-            // Build messages array for API (exclude error messages)
+            // Only model-visible turns. Errors and the opener are written
+            // client-side; sending them back teaches the model to imitate them.
             const apiMessages = [...messages, userMsg]
-                .filter((m) => !m.error)
+                .filter((m) => !m.error && !m.local)
                 .map(({ role, content: c }) => ({ role, content: c }));
 
             abortControllerRef.current?.abort();
@@ -509,11 +521,11 @@ function ChatWindow({
                             : null;
 
                 if (!res.ok && !reply) {
-                    throw new Error(t("error"));
+                    throw new Error(pickRequestFailed());
                 }
 
                 if (!reply) {
-                    throw new Error(t("invalidResponse"));
+                    throw new Error(pickEmptyReply());
                 }
 
                 setMessages((prev) => [
@@ -532,7 +544,7 @@ function ChatWindow({
                 const errorMsg =
                     err instanceof Error
                         ? err.message
-                        : t("unknownError");
+                        : pickRequestFailed();
 
                 setMessages((prev) => [
                     ...prev,
@@ -578,7 +590,7 @@ function ChatWindow({
     // Auto-resize textarea
     const handleInputChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            setInput(e.target.value.slice(0, 200));
+            setInput(e.target.value.slice(0, MAX_INPUT_LENGTH));
             const el = e.target;
             el.style.height = "auto";
             el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
@@ -765,7 +777,7 @@ function ChatWindow({
                             value={input}
                             onChange={handleInputChange}
                             onKeyDown={handleKeyDown}
-                            placeholder={t("placeholder", { name: portfolioData.personal.name.split(/\s+/)[0] })}
+                            placeholder={inputPlaceholder(portfolioData.personal.name.split(/\s+/)[0])}
                             maxLength={200}
                             rows={1}
                             className={cn(

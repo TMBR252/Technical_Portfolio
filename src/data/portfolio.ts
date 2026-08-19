@@ -75,6 +75,9 @@ function sampleCaseStudy(args: {
 export const portfolioData: PortfolioData = {
     personal: {
         name: 'Bejaman',
+        // Set your own: 'he/him', 'she/her', 'they/them'. Marvin uses this
+        // verbatim instead of guessing from a name.
+        pronouns: 'they/them',
         title: 'Product Designer',
         subtitle: 'Product designer in Chicago. I get excited about making complicated things simple.',
         bio: "I'm Bejaman, a product designer in Chicago who gets excited about making complicated things simple. Currently at Meridian Health. Previously at Searchless AI. Available for thoughtful projects.",
