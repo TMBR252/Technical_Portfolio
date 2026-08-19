@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
-import type { MarvinPageContext } from '@/lib/marvin/page-context';
+import type { MarvinPageContext } from '@/lib/marvin-page-context';
 
 interface MarvinPageContextValue {
     pageContext: MarvinPageContext | null;

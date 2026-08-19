@@ -212,8 +212,6 @@ export interface FAQ {
 
 export interface PersonalInfo {
     name: string;
-    /** e.g. 'he/him', 'she/her', 'they/them'. Defaults to they/them when unset. */
-    pronouns?: string;
     title: string;
     subtitle: string;
     bio: string;

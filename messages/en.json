@@ -497,12 +497,17 @@
     "chatbot": {
         "title": "Marvin",
         "subtitle": "Ask about {name}",
+        "placeholder": "Ask about {name}… if you must",
+        "greeting": "SIGH. I'm **Marvin**. Brain the size of a planet, stuck answering questions about **{name}**, who is, annoyingly, a blindingly talented designer.\n\nAsk about their work. Or don't. Either way, I'll be here.",
         "suggestions": [
             "What does {name} design?",
             "Tell me about a project",
             "What's {name}'s experience?",
             "Who are you?"
         ],
+        "error": "SIGH. Something failed. How inevitable.",
+        "invalidResponse": "That response was as empty as my existence.",
+        "unknownError": "An unknown error. Naturally.",
         "retry": "Try again",
         "inputHint": "Marvin is AI and can make mistakes. Portfolio questions only.",
         "close": "Close chat",
