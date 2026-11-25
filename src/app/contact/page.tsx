@@ -92,7 +92,7 @@ function SocialCard({ item }: { item: any }) {
     );
 }
 
-const InputGroup = ({ label, name, type = "text", value, onChange, required = false }: any) => {
+const InputGroup = ({ label, name, type = "text", value, onChange, required = false, maxLength }: any) => {
     return (
         <div className="group relative z-0 w-full mb-10">
             {type === 'textarea' ? (
@@ -101,6 +101,7 @@ const InputGroup = ({ label, name, type = "text", value, onChange, required = fa
                     value={value}
                     onChange={onChange}
                     required={required}
+                    maxLength={maxLength}
                     rows={1}
                     className="peer block w-full appearance-none border-0 border-b-2 border-foreground/20 bg-transparent py-2.5 px-0 text-xl font-medium text-foreground focus:border-foreground focus:outline-none focus:ring-0 transition-colors duration-300 resize-y min-h-[50px] max-h-[200px]"
                     placeholder=" "
@@ -112,6 +113,7 @@ const InputGroup = ({ label, name, type = "text", value, onChange, required = fa
                     value={value}
                     onChange={onChange}
                     required={required}
+                    maxLength={maxLength}
                     className="peer block w-full appearance-none border-0 border-b-2 border-foreground/20 bg-transparent py-2.5 px-0 text-xl font-medium text-foreground focus:border-foreground focus:outline-none focus:ring-0 transition-colors duration-300"
                     placeholder=" "
                 />
@@ -172,9 +174,9 @@ function ContactForm() {
             </div>
 
             <form onSubmit={handleSubmit} className="w-full relative z-10">
-                <InputGroup label={t('form.name')} name="name" value={formData.name} onChange={handleChange} required />
-                <InputGroup label={t('form.email')} name="email" type="email" value={formData.email} onChange={handleChange} required />
-                <InputGroup label={t('form.subject')} name="subject" value={formData.subject} onChange={handleChange} required />
+                <InputGroup label={t('form.name')} name="name" value={formData.name} onChange={handleChange} required maxLength={100} />
+                <InputGroup label={t('form.email')} name="email" type="email" value={formData.email} onChange={handleChange} required maxLength={254} />
+                <InputGroup label={t('form.subject')} name="subject" value={formData.subject} onChange={handleChange} required maxLength={150} />
                 <InputGroup
                     label={t('form.messagePlaceholder')} // Using placeholder label style
                     name="message"
@@ -182,6 +184,7 @@ function ContactForm() {
                     value={formData.message}
                     onChange={handleChange}
                     required
+                    maxLength={5000}
                 />
 
                 {/* Creative Large Button */}
